@@ -5,9 +5,11 @@ obj/
 .vs/
 x64/
 x86/
+packages/
 # Bỏ qua các file tạm hoặc log
 *.log
 *.tmp
+
 
 # Bỏ qua file của IDE/Editor (Visual Studio, JetBrains, etc.)
 .vscode/
