@@ -248,7 +248,7 @@ System::String^ Yolo::CheckYolo(float Score) {
 	if(status!="")
 		return gcnew System::String(status.c_str());
 	int cycle = int(clock() - startTime);
-	return gcnew System::String(numDetected+","+ cycle+"ms");
+	return gcnew System::String("0," +numDetected + "," + cycle + ",0");
 	///gil_acquire1.~gil_scoped_acquire_local();
 //	gil_acquire.~gil_scoped_acquire_local();
 }

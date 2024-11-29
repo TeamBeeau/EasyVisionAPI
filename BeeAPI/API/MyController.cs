@@ -163,9 +163,25 @@ namespace BeeAPI.Controllers
         [Route("TestYolo")]
         public IHttpActionResult TestYolo(float Score)
         {
-            string value = Global.GIL.TestYolo(Score);
-            Console.WriteLine($"Response: {value}");
-            return Ok(new { value = value });
+            string result = Global.GIL.TestYolo(Score);
+            string[] numbers = result.Split(',');
+            if (numbers.Length > 2)
+            {
+                Global.model.Result.Wires = long.Parse(numbers[0]);
+                Global.model.Result.Counter = int.Parse(numbers[1]);
+                Global.model.Result.Cycle = int.Parse(numbers[2]);
+                Console.WriteLine($"Response: {result}");
+                return Ok(new { value = Global.model.Result });
+                
+            }
+          
+                Console.WriteLine($"Response: {result}");
+                return Ok(result);
+            
+           
+          
+          
+       
         }
 
         [HttpGet]
@@ -177,9 +193,13 @@ namespace BeeAPI.Controllers
                 Native.GrabBasler();
                 string result = Global.GIL.CheckYolo(Global.model.Vision.Score);
                 string[] numbers = result.Split(',');
-                Global.model.Result.Wires = long.Parse(numbers[0]);
-                Global.model.Result.Counter = int.Parse(numbers[1]);
-                Global.model.Result.Cycle = int.Parse(numbers[2]);
+                if(numbers.Length > 2)
+                {
+                    Global.model.Result.Wires = long.Parse(numbers[0]);
+                    Global.model.Result.Counter = int.Parse(numbers[1]);
+                    Global.model.Result.Cycle = int.Parse(numbers[2]);
+                }
+             
                 return Ok(new { value = Global.model.Result });
             }
             catch (Exception ex) 

@@ -42,6 +42,7 @@ namespace BeeAPI
         {
             lock (this)
             {
+             //   Yolo.ImportRaw();
                 return Yolo.CheckYolo(Score);
             }
         }
