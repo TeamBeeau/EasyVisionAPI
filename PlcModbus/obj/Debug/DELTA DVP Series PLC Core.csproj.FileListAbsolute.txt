@@ -1,0 +1,24 @@
+D:\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\bin\Debug\IndustrialNetworks.ModbusCore.dll
+D:\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\bin\Debug\IndustrialNetworks.ModbusCore.pdb
+D:\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\IndustrialNetworks.ModbusCore.Properties.Resources.resources
+D:\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\DELTA DVP Series PLC Core.csproj.GenerateResource.Cache
+D:\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\IndustrialNetworks.ModbusCore.dll
+D:\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\IndustrialNetworks.ModbusCore.pdb
+D:\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\DELTA DVP Series PLC Core.csproj.AssemblyReference.cache
+D:\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\DELTA DVP Series PLC Core.csproj.CoreCompileInputs.cache
+D:\ChiTu\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\bin\Debug\IndustrialNetworks.ModbusCore.dll
+D:\ChiTu\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\bin\Debug\IndustrialNetworks.ModbusCore.pdb
+D:\ChiTu\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\DELTA DVP Series PLC Core.csproj.AssemblyReference.cache
+D:\ChiTu\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\IndustrialNetworks.ModbusCore.Properties.Resources.resources
+D:\ChiTu\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\DELTA DVP Series PLC Core.csproj.GenerateResource.cache
+D:\ChiTu\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\DELTA DVP Series PLC Core.csproj.CoreCompileInputs.cache
+D:\ChiTu\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\IndustrialNetworks.ModbusCore.dll
+D:\ChiTu\ChiTu\Codes\BeeVision\DELTA DVP Series PLC Core\obj\Debug\IndustrialNetworks.ModbusCore.pdb
+D:\DRB\28_11\DELTA DVP Series PLC Core\bin\Debug\IndustrialNetworks.ModbusCore.dll
+D:\DRB\28_11\DELTA DVP Series PLC Core\bin\Debug\IndustrialNetworks.ModbusCore.pdb
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Debug\DELTA DVP Series PLC Core.csproj.AssemblyReference.cache
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Debug\IndustrialNetworks.ModbusCore.Properties.Resources.resources
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Debug\DELTA DVP Series PLC Core.csproj.GenerateResource.cache
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Debug\DELTA DVP Series PLC Core.csproj.CoreCompileInputs.cache
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Debug\IndustrialNetworks.ModbusCore.dll
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Debug\IndustrialNetworks.ModbusCore.pdb

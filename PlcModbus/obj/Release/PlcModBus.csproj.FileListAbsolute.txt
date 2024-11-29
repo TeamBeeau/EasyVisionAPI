@@ -1,0 +1,24 @@
+D:\DRB\28_11\DELTA DVP Series PLC Core\bin\Release\IndustrialNetworks.ModbusCore.dll
+D:\DRB\28_11\DELTA DVP Series PLC Core\bin\Release\IndustrialNetworks.ModbusCore.pdb
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Release\PlcModBus.csproj.AssemblyReference.cache
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Release\IndustrialNetworks.ModbusCore.Properties.Resources.resources
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Release\PlcModBus.csproj.GenerateResource.cache
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Release\PlcModBus.csproj.CoreCompileInputs.cache
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Release\IndustrialNetworks.ModbusCore.dll
+D:\DRB\28_11\DELTA DVP Series PLC Core\obj\Release\IndustrialNetworks.ModbusCore.pdb
+D:\DRB\28_11\BeeCen\BeeCen\PlcModbus\bin\Release\IndustrialNetworks.ModbusCore.dll
+D:\DRB\28_11\BeeCen\BeeCen\PlcModbus\bin\Release\IndustrialNetworks.ModbusCore.pdb
+D:\DRB\28_11\BeeCen\BeeCen\PlcModbus\obj\Release\PlcModbus.csproj.AssemblyReference.cache
+D:\DRB\28_11\BeeCen\BeeCen\PlcModbus\obj\Release\IndustrialNetworks.ModbusCore.Properties.Resources.resources
+D:\DRB\28_11\BeeCen\BeeCen\PlcModbus\obj\Release\PlcModbus.csproj.GenerateResource.cache
+D:\DRB\28_11\BeeCen\BeeCen\PlcModbus\obj\Release\PlcModbus.csproj.CoreCompileInputs.cache
+D:\DRB\28_11\BeeCen\BeeCen\PlcModbus\obj\Release\IndustrialNetworks.ModbusCore.dll
+D:\DRB\28_11\BeeCen\BeeCen\PlcModbus\obj\Release\IndustrialNetworks.ModbusCore.pdb
+D:\EasyVisionAPI\PlcModbus\bin\Release\IndustrialNetworks.ModbusCore.dll
+D:\EasyVisionAPI\PlcModbus\bin\Release\IndustrialNetworks.ModbusCore.pdb
+D:\EasyVisionAPI\PlcModbus\obj\Release\PlcModbus.csproj.AssemblyReference.cache
+D:\EasyVisionAPI\PlcModbus\obj\Release\IndustrialNetworks.ModbusCore.Properties.Resources.resources
+D:\EasyVisionAPI\PlcModbus\obj\Release\PlcModbus.csproj.GenerateResource.cache
+D:\EasyVisionAPI\PlcModbus\obj\Release\PlcModbus.csproj.CoreCompileInputs.cache
+D:\EasyVisionAPI\PlcModbus\obj\Release\IndustrialNetworks.ModbusCore.dll
+D:\EasyVisionAPI\PlcModbus\obj\Release\IndustrialNetworks.ModbusCore.pdb
