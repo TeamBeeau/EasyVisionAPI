@@ -1,0 +1,15 @@
+# Bỏ qua các thư mục build, bin, obj
+bin/
+build/
+obj/
+
+# Bỏ qua các file tạm hoặc log
+*.log
+*.tmp
+
+# Bỏ qua file của IDE/Editor (Visual Studio, JetBrains, etc.)
+.vscode/
+*.user
+*.suo
+*.bak
+*.cache
