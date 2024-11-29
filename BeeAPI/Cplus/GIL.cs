@@ -33,8 +33,8 @@ namespace BeeAPI
         public String TestYolo(float Score)
         {
             lock (this)
-            {
-                Yolo.ImportRaw();
+            { 
+                Yolo.ImportRaw(); //Nhập ảnh mẫu
                 return Yolo.CheckYolo(Score);
             }
         }
