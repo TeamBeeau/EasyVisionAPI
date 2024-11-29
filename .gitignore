@@ -2,7 +2,9 @@
 bin/
 build/
 obj/
-
+.vs/
+x64/
+x86/
 # Bỏ qua các file tạm hoặc log
 *.log
 *.tmp
