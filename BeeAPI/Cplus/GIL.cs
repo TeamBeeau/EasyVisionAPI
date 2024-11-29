@@ -34,7 +34,8 @@ namespace BeeAPI
         {
             lock (this)
             {
-                return Yolo.TestYolo(Score);
+                Yolo.ImportRaw();
+                return Yolo.CheckYolo(Score);
             }
         }
         public String CheckYolo(float Score)
