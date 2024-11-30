@@ -190,7 +190,7 @@ namespace BeeAPI.Controllers
         {
             try
             {
-                Native.GrabBasler();
+              
                 string result = Global.GIL.CheckYolo(Global.model.Vision.Score);
                 string[] numbers = result.Split(',');
                 if(numbers.Length > 2)
@@ -198,9 +198,11 @@ namespace BeeAPI.Controllers
                     Global.model.Result.Wires = long.Parse(numbers[0]);
                     Global.model.Result.Counter = int.Parse(numbers[1]);
                     Global.model.Result.Cycle = int.Parse(numbers[2]);
+                    return Ok(new { value = Global.model.Result });
                 }
-             
-                return Ok(new { value = Global.model.Result });
+             else
+                    return Ok(new { value = result });
+
             }
             catch (Exception ex) 
             {

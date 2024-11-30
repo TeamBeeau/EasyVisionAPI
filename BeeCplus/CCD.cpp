@@ -153,7 +153,7 @@ extern "C" __declspec(dllexport) const char* IniBasler()
 DeviceInfoList_t devices;
 
 List<System::String^>^ CCD::ScanBasler() {
-
+	IsScan = false;
 	PylonInitialize();
 	listNameCCD = gcnew List<System::String^>();
 	//std::lock_guard<std::mutex> lock(gilmutex);
@@ -187,11 +187,12 @@ List<System::String^>^ CCD::ScanBasler() {
 	catch (const std::exception& e) {
 		return  gcnew List<System::String^>();
 	}
-
+	IsScan = true;
 	return listNameCCD; // Trả về con trỏ tới chuỗi C-style
 }
 System::String^ CCD:: ConnectBasler(System::String^ device) {
 	if (device=="")return "";
+	if(!IsScan)return "";
 	try
 	{
 		int index = listNameCCD->IndexOf(device);
@@ -260,7 +261,7 @@ System::String^ CCD:: ConnectBasler(System::String^ device) {
 }
 
 extern "C" __declspec(dllexport) void GrabBasler() {
-	//std::lock_guard<std::mutex>lock(gilmutex);
+	std::lock_guard<std::mutex>lock(gilmutex);
 	
 	camGigE.StartGrabbing();
 	camGigE.RetrieveResult(-1, ptrGrabResult, TimeoutHandling_ThrowException);//Lay Data Camera SAU KHOẢNG THỜI GIAN SẼ THOÁT RA ,(NẾU GIÁ TRỊ BẰNG -1 KHÔNG THOÁT RA)

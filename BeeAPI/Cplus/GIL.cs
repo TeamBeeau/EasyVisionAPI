@@ -32,19 +32,18 @@ namespace BeeAPI
         }
         public String TestYolo(float Score)
         {
-            lock (this)
-            { 
+           
                 Yolo.ImportRaw(); //Nhập ảnh mẫu
                 return Yolo.CheckYolo(Score);
-            }
+            
         }
         public String CheckYolo(float Score)
         {
-            lock (this)
-            {
-             //   Yolo.ImportRaw();
+           
+                Native.GrabBasler();
+                //   Yolo.ImportRaw();
                 return Yolo.CheckYolo(Score);
-            }
+            
         }
     }
 }

@@ -157,7 +157,7 @@ System::String^ Yolo::CheckYolo(float Score) {
 	double startTime = clock();
 	std::tuple<py::list, py::list> result=GIL(Score);
 	matResult = matProcess.clone();
-	//std::lock_guard<std::mutex>lock(gilmutex);
+	std::lock_guard<std::mutex>lock(gilmutex);
 	
 	int numDetected = 0;
 	float pixelCable = 0, sumOfAll = 0;

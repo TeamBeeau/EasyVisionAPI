@@ -36,6 +36,7 @@ namespace BeeCplus {
 
 	public ref class CCD
 	{
+	public: bool IsScan ;
 	List<System::String^>^ listNameCCD;
 	public:float cycle = 0;
 	public:int numERR = 0;
