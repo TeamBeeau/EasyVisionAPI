@@ -22,6 +22,8 @@ System::String^ Yolo::FinalizeGIL() {
 		std::cerr << "Python initialization failed!" << std::endl;
 		return "Python initialization failed!";
 	}
+//	Py_Finalize();
+// py::gil_scoped_release release;
 	///std::lock_guard<std::mutex> lock(gilmutex);
 	python_terminated = true;
 	nt.notify_all();
@@ -41,7 +43,7 @@ System::String^ Yolo::IniGIL() {
 		gil_scoped_acquire_local gil_acquire;
 
 		
-	
+		std::lock_guard<std::mutex>lock(gilmutex);
 		
 		//std::unique_lock<std::mutex> lock(gilmutex);
 		//py::gil_scoped_acquire acquire;
@@ -95,7 +97,7 @@ System::String^ Yolo::ImportRaw()
 bool IsCheking = false;
 std::tuple<py::list, py::list> GIL(float Score)
 {
-	//std::lock_guard<std::mutex>lock(gilmutex);
+//	std::lock_guard<std::mutex>lock(gilmutex);
 	IsCheking = true;
 	std::string status = "";
 	try
@@ -160,12 +162,12 @@ System::String^ Yolo::CheckYolo(float Score) {
 		return FALSE;
 	}
 	double startTime = clock();
-	std::unique_lock<std::mutex> lock(gilmutex);
-	//std::lock_guard<std::mutex>lock(gilmutex);
+	//std::unique_lock<std::mutex> lock(gilmutex);
+	std::lock_guard<std::mutex>lock(gilmutex);
 	std::tuple<py::list, py::list> result=GIL(Score);
 	
 	std::cout << "Unlocked by thread: " << std::this_thread::get_id() << std::endl;
-	lock.unlock();
+	//lock.unlock();
 	matResult = matProcess.clone();
 	//
 	

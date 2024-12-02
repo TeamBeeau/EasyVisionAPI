@@ -18,7 +18,8 @@ namespace BeeAPI.Controllers
     [RoutePrefix("api/bee")]
     public class MyController : ApiController
     {
-        private static readonly object _lock = new object();
+        private static Mutex _mutex = new Mutex(false, "GlobalLockExample");
+
         [HttpGet]
         [Route("SetVision")]
         public IHttpActionResult SetVision( string vision,  string value)
@@ -168,14 +169,26 @@ namespace BeeAPI.Controllers
         {
             try
             {
-                lock (this)
+                if (_mutex.WaitOne(TimeSpan.FromSeconds(5)))
                 {
-                    var result = Global.GIL.IniGIL();
+                    try
+                    {
+                        var result = Global.GIL.IniGIL();
+                        Console.WriteLine(result.ToString());
                         if (result.Contains("SUCCESS"))
+                       
+                          
                             return Ok(new { message = "Python initialized and connected successfully." });
                         else
                             return StatusCode(System.Net.HttpStatusCode.RequestTimeout);
+
+                    }
+                    finally
+                    {
+                        _mutex.ReleaseMutex();
+                    }
                    
+
                 }
             
                 return Ok("");
@@ -218,34 +231,44 @@ namespace BeeAPI.Controllers
         {
             try
             {
-                    
-                   
-                    //  Native.GrabBasler();
-                   
-               lock(this)
+
+                if (_mutex.WaitOne(TimeSpan.FromSeconds(5)))
                 {
-                   
+                    try
+                    {
+
                         Global.CCD.GrabBasler();
                         string result = Global.GIL.CheckYolo(Global.model.Vision.Score);
 
-                    string[] numbers = result.Split(',');
-                    if (numbers.Length > 2)
-                    {
-                        Global.model.Result.Wires = long.Parse(numbers[0]);
-                        Global.model.Result.Counter = int.Parse(numbers[1]);
-                        Global.model.Result.Cycle = int.Parse(numbers[2]);
-                        return Ok(new { value = Global.model.Result });
-                    }
-                    else
-                    {
-                        Console.WriteLine(result);
-                        return Ok(new { value = result });
+                        string[] numbers = result.Split(',');
+                        if (numbers.Length > 2)
+                        {
+                            Global.model.Result.Wires = long.Parse(numbers[0]);
+                            Global.model.Result.Counter = int.Parse(numbers[1]);
+                            Global.model.Result.Cycle = int.Parse(numbers[2]);
+                            return Ok(new { value = Global.model.Result });
+                        }
+                        else
+                        {
+                            Console.WriteLine(result);
+                            return Ok(new { value = result });
 
-                      
 
+
+                        }
                     }
+                    finally
+                    {
+                        _mutex.ReleaseMutex();
+                    }
+
+
+                }
+                //  Native.GrabBasler();
+
+
              
-        }
+        
                 return Ok("");
 
 
@@ -267,14 +290,39 @@ namespace BeeAPI.Controllers
             {
                 return BadRequest("Không có dữ liệu hình ảnh.");
             }
-            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+            try
             {
-                Content = new ByteArrayContent(imageData)
-            };
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+                //     HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+                // Thiết lập các header để vô hiệu hóa cache
+                response.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+                {
+                    NoCache = true,
+                    NoStore = false,
+                    MustRevalidate = false
+                };
+                response.Headers.Pragma.Add(new System.Net.Http.Headers.NameValueHeaderValue("no-cache"));
+                response.Headers.Add("Expires", "0");
+                response.Content = new ByteArrayContent(imageData);
 
-            return ResponseMessage(response);
+                //IsRead = false;
+                response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+                // Hủy tham chiếu đối tượng để garbage collector thu hồi
+                //    mediaType = null;
+
+                // Thực thi garbage collection (chưa chắc sẽ thu hồi ngay)
+                return ResponseMessage(response);
+
+            }
+            finally
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                Console.WriteLine("Release");
+                // Giải phóng tài nguyên khi xong
+                //   // Nếu đối tượng implement IDisposable
+            }
         }
         [HttpGet]
         [Route("ImageRaw")]
@@ -286,76 +334,113 @@ namespace BeeAPI.Controllers
             {
                 return BadRequest("Không có dữ liệu hình ảnh.");
             }
-            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+            try
             {
-                Content = new ByteArrayContent(imageData)
-            };
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+                //     HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+                // Thiết lập các header để vô hiệu hóa cache
+                response.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+                {
+                    NoCache = true,
+                    NoStore = false,
+                    MustRevalidate = false
+                };
+                response.Headers.Pragma.Add(new System.Net.Http.Headers.NameValueHeaderValue("no-cache"));
+                response.Headers.Add("Expires", "0");
+                response.Content = new ByteArrayContent(imageData);
 
-            return ResponseMessage(response);
+                //IsRead = false;
+                response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+                // Hủy tham chiếu đối tượng để garbage collector thu hồi
+                //    mediaType = null;
+
+                // Thực thi garbage collection (chưa chắc sẽ thu hồi ngay)
+                return ResponseMessage(response);
+
+            }
+            finally
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                Console.WriteLine("Release");
+                // Giải phóng tài nguyên khi xong
+                //   // Nếu đối tượng implement IDisposable
+            }
         }
         HttpResponseMessage response;
         bool IsRead = false;
         [HttpGet]
         [Route("GrabRaw")]
 
-        public async Task< IHttpActionResult> GrabRaw()
+        public IHttpActionResult GrabRaw()
         {
-            lock (this)
+            if (_mutex.WaitOne(TimeSpan.FromSeconds(5)))
             {
-                if (IsRead)
-                    return Ok("Wait");
-                IsRead = true;
-
-                //Native.GrabBasler();
-                Global.CCD.GrabBasler();
-
-                byte[] imageData = GetImg.ByteRaw();
-
-                if (imageData == null || imageData.Length == 0)
-                {
-                    IsRead = false;
-                    return BadRequest("Không có dữ liệu hình ảnh.");
-                }
-
-
                 try
                 {
-                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
-                 //     HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-                    // Thiết lập các header để vô hiệu hóa cache
-                    response.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+                    if (IsRead)
+                        return Ok("Wait");
+                    IsRead = true;
+
+                    //Native.GrabBasler();
+                    Global.CCD.GrabBasler();
+
+                    byte[] imageData = GetImg.ByteRaw();
+
+                    if (imageData == null || imageData.Length == 0)
                     {
-                        NoCache = true,
-                        NoStore = true,
-                        MustRevalidate = true
-                    };
-                    response.Headers.Pragma.Add(new System.Net.Http.Headers.NameValueHeaderValue("no-cache"));
-                    response.Headers.Add("Expires", "0");
-                    response.Content = new ByteArrayContent(imageData);
-                
-                    //IsRead = false;
-                    response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
-                    // Hủy tham chiếu đối tượng để garbage collector thu hồi
-                    //    mediaType = null;
+                        IsRead = false;
+                        return BadRequest("Không có dữ liệu hình ảnh.");
+                    }
 
-                    // Thực thi garbage collection (chưa chắc sẽ thu hồi ngay)
-                    return ResponseMessage(response);
 
+                    try
+                    {
+                        HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+                        //     HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+
+                        // Thiết lập các header để vô hiệu hóa cache
+                        response.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+                        {
+                            NoCache = true,
+                            NoStore = false,
+                            MustRevalidate = false
+                        };
+                        response.Headers.Pragma.Add(new System.Net.Http.Headers.NameValueHeaderValue("no-cache"));
+                        response.Headers.Add("Expires", "0");
+                        response.Content = new ByteArrayContent(imageData);
+
+                        //IsRead = false;
+                        response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+                        // Hủy tham chiếu đối tượng để garbage collector thu hồi
+                        //    mediaType = null;
+
+                        // Thực thi garbage collection (chưa chắc sẽ thu hồi ngay)
+                        return ResponseMessage(response);
+
+                    }
+                    finally
+                    {
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        Console.WriteLine("Release");
+                        // Giải phóng tài nguyên khi xong
+                        //   // Nếu đối tượng implement IDisposable
+                    }
                 }
                 finally
                 {
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    Console.WriteLine("Release");
-                    // Giải phóng tài nguyên khi xong
-                    //   // Nếu đối tượng implement IDisposable
+                    _mutex.ReleaseMutex();
                 }
+
+
             }
+        
+            
           //  return result;
-              //  return Ok(imageData);
+               return Ok("FAIL");
             
         }
         [HttpGet]

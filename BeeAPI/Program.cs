@@ -33,8 +33,9 @@ namespace BeeAPI
              //  tmIniTial.Enabled = true;
                 Console.WriteLine("Press Enter to exit...");
               Console.ReadLine();
-              Global.GIL.FinalizeGIL();
                 Global.CCD.DisconnectBasler();
+                Global.GIL.FinalizeGIL();
+              
             }
         }
 

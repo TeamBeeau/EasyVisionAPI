@@ -15,20 +15,19 @@ namespace BeeAPI
         {
             unsafe
             {
-                lock (this)
-                {
+
+              
                     return Yolo.IniGIL();
-                }
+                
             }
         }
         public String FinalizeGIL()
         {
             unsafe
             {
-                lock (this)
-                {
+              
                     return Yolo.FinalizeGIL();
-                }
+                
             }
         }
        
