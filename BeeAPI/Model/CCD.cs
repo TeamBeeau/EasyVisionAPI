@@ -47,55 +47,55 @@ namespace BeeAPI
                         if (!float.TryParse(value, out float exposureTemp))
                             return $"Invalid value for {para}: {value}";
                         Exposure = exposureTemp;
-                       Native. SetPara(para, Exposure);
+                       Global.CCD. SetPara(para, Exposure);
                         return "Exposure đã được cập nhật";
                     case "Gamma":
                         if (!float.TryParse(value, out float gammaTemp))
                             return $"Invalid value for {para}: {value}";
                         Gamma = gammaTemp;
-                        Native.SetPara(para, Gamma);
+                        Global.CCD.SetPara(para, Gamma);
                         return "Gamma đã được cập nhật";
 
                     case "Gain":
                         if (!float.TryParse(value, out float gainTemp))
                             return $"Invalid value for {para}: {value}";
                         Gain = gainTemp;
-                        Native.SetPara(para, Gain);
+                        Global.CCD.SetPara(para, Gain);
                         return "Gain đã được cập nhật";
 
                     case "Brightness":
                         if (!float.TryParse(value, out float brinessTemp))
                             return $"Invalid value for {para}: {value}";
                         Briness = brinessTemp;
-                        Native.SetPara(para, Briness);
+                        Global.CCD.SetPara(para, Briness);
                         return "Briness đã được cập nhật";
 
                     case "Width":
                         if (!int.TryParse(value, out int widthTemp))
                             return $"Invalid value for {para}: {value}";
                         Width = widthTemp;
-                        Native.SetPara(para, Width);
+                        Global.CCD.SetPara(para, Width);
                         return "Width đã được cập nhật";
 
                     case "Height":
                         if (!int.TryParse(value, out int heightTemp))
                             return $"Invalid value for {para}: {value}";
                         Height = heightTemp;
-                        Native.SetPara(para, Height);
+                        Global.CCD.SetPara(para, Height);
                         return "Height đã được cập nhật";
 
                     case "OffSetX":
                         if (!float.TryParse(value, out float offSetXTemp))
                             return $"Invalid value for {para}: {value}";
                         OffSetX = offSetXTemp;
-                        Native.SetPara(para, OffSetX);
+                        Global.CCD.SetPara(para, OffSetX);
                         return "OffSetX đã được cập nhật";
 
                     case "OffSetY":
                         if (!float.TryParse(value, out float offSetYTemp))
                             return $"Invalid value for {para}: {value}";
                         OffSetY = offSetYTemp;
-                        Native.SetPara(para, OffSetY);
+                        Global.CCD.SetPara(para, OffSetY);
                         return "OffSetY đã được cập nhật";
 
                     case "Fps":
@@ -118,7 +118,7 @@ namespace BeeAPI
         {
             try
             {
-                string value = Marshal.PtrToStringAnsi(Native.GetPara(para)); 
+                string value = Global.CCD.GetPara(para); 
                 if (string.IsNullOrWhiteSpace(value))
                     return $"Value for {para} is null or empty.";
 
@@ -254,7 +254,7 @@ namespace BeeAPI
 
                         try
                         {
-                            string exp = Marshal.PtrToStringAnsi(Native.SetPara(para, Exposure));
+                            string exp =Global.CCD.SetPara(para, Exposure);
                             return Exposure.ToString();
                         }
 
@@ -266,7 +266,7 @@ namespace BeeAPI
                     case "Gamma":
                         try
                         {
-                            string gam = Marshal.PtrToStringAnsi(Native.SetPara(para, Gamma));
+                            string gam =Global.CCD.SetPara(para, Gamma);
                             return Gamma.ToString();
                         }
 
@@ -278,7 +278,7 @@ namespace BeeAPI
                     case "Gain":
                         try
                         {
-                            string gai = Marshal.PtrToStringAnsi(Native.SetPara(para, Gain));
+                            string gai = Global.CCD.SetPara(para, Gain);
                             return Gain.ToString();
                         }
                         catch
@@ -289,7 +289,7 @@ namespace BeeAPI
                     case "Brightness":
                         try
                         {
-                            string bri = Marshal.PtrToStringAnsi(Native.SetPara(para, Briness));
+                            string bri = Global.CCD.SetPara(para, Briness);
                             return Briness.ToString();
                         }
                         catch
@@ -302,7 +302,7 @@ namespace BeeAPI
                     case "Width":
                         try
                         {
-                            string wid = Marshal.PtrToStringAnsi(Native.SetPara(para, Convert.ToSingle(Width)));
+                            string wid = Global.CCD.SetPara(para, Convert.ToSingle(Width));
                             return Width.ToString();
                         }
                         catch
@@ -315,7 +315,7 @@ namespace BeeAPI
                     case "Height":
                         try
                         {
-                            string hei = Marshal.PtrToStringAnsi(Native.SetPara(para, Convert.ToSingle(Height)));
+                            string hei = Global.CCD.SetPara(para, Convert.ToSingle(Height));
                             return Height.ToString();
                         }
                         catch
@@ -328,7 +328,7 @@ namespace BeeAPI
                     case "OffSetX":
                         try
                         {
-                            string ofx = Marshal.PtrToStringAnsi(Native.SetPara(para, OffSetX));
+                            string ofx = Global.CCD.SetPara(para, OffSetX);
                             return OffSetX.ToString();
                         }
                         catch
@@ -341,7 +341,7 @@ namespace BeeAPI
                     case "OffSetY":
                         try
                         {
-                            string ofy = Marshal.PtrToStringAnsi(Native.SetPara(para, OffSetY));
+                            string ofy = Global.CCD.SetPara(para, OffSetY);
                             return OffSetY.ToString();
                         }
                         catch
@@ -368,14 +368,14 @@ namespace BeeAPI
         {
             try
             {
-                Native.SetPara("Exposure", Exposure);
-                Native.SetPara("Gamma", Gamma);
-                Native.SetPara("Gain", Gain);
-                Native.SetPara("Briness", Briness);
-                Native.SetPara("Width", Width);
-                Native.SetPara("Height", Height);
-                Native.SetPara("OffSetX", OffSetX);
-                Native.SetPara("OffSetY", OffSetY);
+                Global.CCD.SetPara("Exposure", Exposure);
+                Global.CCD.SetPara("Gamma", Gamma);
+                Global.CCD.SetPara("Gain", Gain);
+                Global.CCD.SetPara("Briness", Briness);
+                Global.CCD.SetPara("Width", Width);
+                Global.CCD.SetPara("Height", Height);
+                Global.CCD.SetPara("OffSetX", OffSetX);
+                Global.CCD.SetPara("OffSetY", OffSetY);
                // Console.WriteLine("Load thông số model thành công");
             }
            catch 

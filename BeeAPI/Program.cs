@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -18,7 +18,9 @@ namespace BeeAPI
         static void Main(string[] args)
         {
             string baseAddress = "http://localhost:8080/";
-          
+          //  ThreadPool.SetMaxThreads(1, 1);
+           // ThreadPool.SetMinThreads(1, 1);
+
             using (WebApp.Start<Startup>(url: baseAddress))
             {
                 Console.WriteLine("Bee API v1.0.4 is running at " + baseAddress);
@@ -32,6 +34,7 @@ namespace BeeAPI
                 Console.WriteLine("Press Enter to exit...");
               Console.ReadLine();
               Global.GIL.FinalizeGIL();
+                Global.CCD.DisconnectBasler();
             }
         }
 

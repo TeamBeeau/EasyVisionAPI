@@ -22,13 +22,13 @@ namespace BeeCplus
 	vector< cv::Mat> m_matDst;
 	uchar* ucRaw; uchar* ucCrop;
 
-	//string _toString(System::String^ STR)
-	//{
-	//	char cStr[1000] = { 0 };
-	//	sprintf(cStr, "%s", STR);
-	//	std::string s(cStr);
-	//	return s;
-	//}
+	string _toString(System::String^ STR)
+	{
+		char cStr[1000] = { 0 };
+		sprintf(cStr, "%s", STR);
+		std::string s(cStr);
+		return s;
+	}
 	
 	py::object _yolo;
 

@@ -100,7 +100,7 @@ namespace BeeAPI
         
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             Model model = serializer.Deserialize<Model>(File.ReadAllText(path));
-            Global.model.CCD.SetAllValueModel();
+           
             return model;
         }
     }

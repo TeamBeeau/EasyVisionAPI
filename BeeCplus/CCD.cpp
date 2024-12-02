@@ -61,7 +61,36 @@ void SetImage(int indexTool, uchar* uc, int image_rows, int image_cols, int imag
 	if (m_matDst[indexTool].type() == CV_8UC3)
 		cvtColor(m_matDst[indexTool], m_matDst[indexTool], COLOR_BGR2GRAY);
 }
+cli::array<Byte>^ CCD::GetRaw()
+{
+	
 
+	// Create a byte array in managed memory
+	cli::array<Byte>^ byteArray = gcnew cli::array<Byte>(matRaw.total() * matRaw.elemSize());
+	cols = matRaw.cols;
+	rows = matRaw.rows;
+	typ = matRaw.type();
+	// Pin the array to copy data
+	pin_ptr<Byte> pinnedArray = &byteArray[0];
+	memcpy(pinnedArray, matRaw.data, matRaw.total() * matRaw.elemSize());
+
+	return byteArray;
+}
+cli::array<Byte>^ CCD::GetResult()
+{
+
+
+	// Create a byte array in managed memory
+	cli::array<Byte>^ byteArray = gcnew cli::array<Byte>(matResult.total() * matResult.elemSize());
+	cols = matResult.cols;
+	rows = matResult.rows;
+	typ = matResult.type();
+	// Pin the array to copy data
+	pin_ptr<Byte> pinnedArray = &byteArray[0];
+	memcpy(pinnedArray, matResult.data, matResult.total() * matResult.elemSize());
+
+	return byteArray;
+}
 extern "C" __declspec(dllexport) uchar* GetImage(int* rows, int* cols, int* Type)
 {
 	int rows_ = matRaw.rows;
@@ -210,8 +239,8 @@ System::String^ CCD:: ConnectBasler(System::String^ device) {
 				{
 					ptrAutoPacketSize->SetValue(true);
 				}
-				camGigE.Width.SetValue(colCCD);
-				camGigE.Height.SetValue(rowCCD);
+				camGigE.Width.SetValue(cols);
+				camGigE.Height.SetValue(rows);
 				int with = (int)camGigE.Width.GetMax();
 				int height = (int)camGigE.Height.GetMax();
 				camGigE.CenterX = true;
@@ -260,25 +289,6 @@ System::String^ CCD:: ConnectBasler(System::String^ device) {
 	}
 }
 
-extern "C" __declspec(dllexport) void GrabBasler() {
-	std::lock_guard<std::mutex>lock(gilmutex);
-	
-	camGigE.StartGrabbing();
-	camGigE.RetrieveResult(-1, ptrGrabResult, TimeoutHandling_ThrowException);//Lay Data Camera SAU KHOẢNG THỜI GIAN SẼ THOÁT RA ,(NẾU GIÁ TRỊ BẰNG -1 KHÔNG THOÁT RA)
-	if (ptrGrabResult->GrabSucceeded())
-	{
-		fc.Convert(image, ptrGrabResult);
-		matRaw = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC1, (uint8_t*)image.GetBuffer(), Mat::AUTO_STEP);
-		if (matRaw.type() == CV_8UC1) {
-			cv::cvtColor(matRaw, matProcess, CV_GRAY2BGR);
-		}
-		else {
-			matProcess = matRaw.clone();
-		}
-	}
-	ptrGrabResult.Release();
-	camGigE.StopGrabbing();
-}
 
 Mat equalizeBGRA(const Mat& img)
 {
@@ -315,6 +325,36 @@ Mat equalizeBGRA(const Mat& img)
 	}
 
 	return res;
+}bool IsCap = false;
+System::String^ CCD::GrabBasler() {
+	if (IsCap)
+		return "";
+	//std::lock_guard<std::mutex>lock(gilmutex);
+	IsCap = true;
+	//std::unique_lock<std::mutex> lock(gilmutex);
+	matRaw.release();
+	matProcess.release();
+	matResult.release();
+	camGigE.StartGrabbing();
+	camGigE.RetrieveResult(-1, ptrGrabResult, TimeoutHandling_ThrowException);//Lay Data Camera SAU KHOẢNG THỜI GIAN SẼ THOÁT RA ,(NẾU GIÁ TRỊ BẰNG -1 KHÔNG THOÁT RA)
+	if (ptrGrabResult->GrabSucceeded())
+	{
+		fc.Convert(image, ptrGrabResult);
+		matRaw = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC1, (uint8_t*)image.GetBuffer(), Mat::AUTO_STEP);
+		if (matRaw.type() == CV_8UC1) {
+			cv::cvtColor(matRaw, matProcess, CV_GRAY2BGR);
+		}
+		else {
+			matProcess = matRaw.clone();
+		}
+	}
+
+	ptrGrabResult.Release();
+	camGigE.StopGrabbing();
+	//lock.unlock();
+	IsCap = false;
+
+	return SUCCESS;
 }
 
 void CCD::ReadRaw(bool IsHist)
@@ -418,14 +458,14 @@ System::String^ CCD:: DisconnectBasler()
 	}
 }
 
-extern "C" __declspec(dllexport) const char* SetPara(const char* name, float value)
+System::String^  CCD::SetPara(System::String^ name, float value)
 {
 	static std::string result;
 	try
 	{
 		int maxVal, minVal;
 		float minG, maxG;
-		Parameter param = getParamEnum(name);
+		Parameter param = getParamEnum(_toString(name));
 		switch (param)
 		{
 		case EXPOSURE:
@@ -502,19 +542,19 @@ extern "C" __declspec(dllexport) const char* SetPara(const char* name, float val
 			result = "INVALID PARAMETER NAME.";
 			break;
 		}
-		return result.c_str();
+		return  gcnew System::String(result.c_str());
 	}
 	catch (const GenericException& e)
 	{
 		std::string err = "ERROR :";
 		err.append(e.GetDescription());
-		return err.c_str();
+		return gcnew System::String(err.c_str());
 	}
 	catch (const std::exception& e)
 	{
 		std::string err = "ERROR :";
 		err.append(e.what());
-		return err.c_str();
+		return gcnew System::String(err.c_str());
 	}
 	catch (...)
 	{
@@ -522,12 +562,12 @@ extern "C" __declspec(dllexport) const char* SetPara(const char* name, float val
 	}
 }
 
-extern "C" __declspec(dllexport) const char* GetPara(const char* name)
+System::String^ CCD::GetPara(System::String^ name)
 {
 	static std::string result;
 	try
 	{
-		Parameter param = getParamEnum(name);
+		Parameter param = getParamEnum(_toString( name));
 		switch (param)
 		{
 		case EXPOSURE:
@@ -564,23 +604,23 @@ extern "C" __declspec(dllexport) const char* GetPara(const char* name)
 			result = "INVALID PARAMETER NAME.";
 			break;
 		}
-		return result.c_str();
+		return gcnew System::String(result.c_str());
 	}
 	catch (const GenericException& e)
 	{
 		std::string err = "ERROR :";
 		err.append(e.GetDescription());
-		return err.c_str();
+		return gcnew System::String(err.c_str());
 	}
 	catch (const std::exception& e)
 	{
 		std::string err = "ERROR :";
 		err.append(e.what());
-		return err.c_str();
+		return gcnew System::String(err.c_str());
 	}
 	catch (...)
 	{
-		return "UNKNOWN ERROR.";
+		return gcnew System::String("UNKNOWN ERROR.");
 	}
 }
 

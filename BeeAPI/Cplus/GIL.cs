@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BeeAPI
@@ -30,6 +31,7 @@ namespace BeeAPI
                 }
             }
         }
+       
         public String TestYolo(float Score)
         {
            
@@ -37,10 +39,9 @@ namespace BeeAPI
                 return Yolo.CheckYolo(Score);
             
         }
-        public String CheckYolo(float Score)
+        public String  CheckYolo(float Score)
         {
            
-                Native.GrabBasler();
                 //   Yolo.ImportRaw();
                 return Yolo.CheckYolo(Score);
             

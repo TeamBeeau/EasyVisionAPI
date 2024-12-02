@@ -10,13 +10,15 @@ using OpenCvSharp;
 using System.Web.Http.Results;
 using System.Reflection;
 using System.Web.Caching;
+using System.Threading;
+using System.Threading.Tasks;
 namespace BeeAPI.Controllers
 {
     
     [RoutePrefix("api/bee")]
     public class MyController : ApiController
     {
-
+        private static readonly object _lock = new object();
         [HttpGet]
         [Route("SetVision")]
         public IHttpActionResult SetVision( string vision,  string value)
@@ -25,23 +27,28 @@ namespace BeeAPI.Controllers
             {
                 return BadRequest("Tên thuộc tính vision và giá trị là bắt buộc và không được để trống." );
             }
-
-            string result = Global.model.Vision.SetVision(vision, value);
-
-            if (result == "Parameter không hợp lệ" || result.Contains("không hợp lệ"))
+            lock (this)
             {
-                return BadRequest(result );
-            }
+                string result = Global.model.Vision.SetVision(vision, value);
 
-            return Ok(new { message = result });
+                if (result == "Parameter không hợp lệ" || result.Contains("không hợp lệ"))
+                {
+                    return BadRequest(result);
+                }
+
+                return Ok(new { message = result });
+            }
         }
         [HttpGet]
         [Route("SetPara")]
         public IHttpActionResult SetPara( string para,  string value)
         {
-            var result = Global.model.CCD.SetParaA(para, value);
+            lock (this)
+            {
+                var result = Global.model.CCD.SetParaA(para, value);
 
-            return Ok(new { message = result ?? "Không nhận được phản hồi từ SetPara" } );
+                return Ok(new { message = result ?? "Không nhận được phản hồi từ SetPara" });
+            }
         }
         [HttpGet]
         [Route("GetVision")]
@@ -51,15 +58,17 @@ namespace BeeAPI.Controllers
             {
                 return BadRequest("Tên thuộc tính vision là bắt buộc và không được để trống.");
             }
-
-            string result = Global.model.Vision.GetVision(vision);
-
-            if (result == "Parameter không hợp lệ")
+            lock (this)
             {
-                return BadRequest("Thuộc tính không hợp lệ.");
-            }
+                string result = Global.model.Vision.GetVision(vision);
 
-            return Ok(new { parameter = vision, value = result });
+                if (result == "Parameter không hợp lệ")
+                {
+                    return BadRequest("Thuộc tính không hợp lệ.");
+                }
+
+                return Ok(new { parameter = vision, value = result });
+            }
         }
         [HttpGet]
         [Route("GetParaModel")]
@@ -67,8 +76,11 @@ namespace BeeAPI.Controllers
         {
             try
             {
-                var result = Global.model.CCD.GetParaCCD(para);
-                return Ok(new { parameter = para, value = result } );
+                lock (this)
+                {
+                    var result = Global.model.CCD.GetParaCCD(para);
+                    return Ok(new { parameter = para, value = result });
+                }
             }
             catch
             {
@@ -81,8 +93,11 @@ namespace BeeAPI.Controllers
         {
             try
             {
-                var result = Global.model.CCD.GetParaA(para);
-                return Ok(new { parameter = para, value = result } );
+                lock (this)
+                {
+                    var result = Global.model.CCD.GetParaA(para);
+                    return Ok(new { parameter = para, value = result });
+                }
             }
             catch
             {
@@ -100,8 +115,11 @@ namespace BeeAPI.Controllers
 
             try
             {
-                Global.model.SaveModel(nameModel);
-                return Ok(new { message = $"Lưu mô hình thành công với tên {nameModel}." } );
+                lock (this)
+                {
+                    Global.model.SaveModel(nameModel);
+                    return Ok(new { message = $"Lưu mô hình thành công với tên {nameModel}." });
+                }
             }
             catch (UnauthorizedAccessException)
             {
@@ -122,15 +140,18 @@ namespace BeeAPI.Controllers
             }
             try
             {
-                Global.model = Global.model.LoadModel(nameModel);
-
-                if (Global.model == null)
+                lock (this)
                 {
-                    return StatusCode(System.Net.HttpStatusCode.NotFound); // ($"Không tìm thấy tệp dữ liệu cho mô hình '{nameModel}'." );
-                }
+                    Global.model = Global.model.LoadModel(nameModel);
+                    Global.model.CCD.SetAllValueModel();
+                    if (Global.model == null)
+                    {
+                        return StatusCode(System.Net.HttpStatusCode.NotFound); // ($"Không tìm thấy tệp dữ liệu cho mô hình '{nameModel}'." );
+                    }
 
-               
-                return Ok(new { value = Global.model });
+
+                    return Ok(new { value = Global.model });
+                }
             }
             catch (UnauthorizedAccessException)
             {
@@ -147,12 +168,19 @@ namespace BeeAPI.Controllers
         {
             try
             {
-                var result = Global.GIL.IniGIL();
-                if(result.Contains("SUCCESS"))
-                return Ok(new { message = "Python initialized and connected successfully." } );
-              else
-                  return StatusCode(System.Net.HttpStatusCode.RequestTimeout);
-            }
+                lock (this)
+                {
+                    var result = Global.GIL.IniGIL();
+                        if (result.Contains("SUCCESS"))
+                            return Ok(new { message = "Python initialized and connected successfully." });
+                        else
+                            return StatusCode(System.Net.HttpStatusCode.RequestTimeout);
+                   
+                }
+            
+                return Ok("");
+        }
+
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
@@ -190,18 +218,38 @@ namespace BeeAPI.Controllers
         {
             try
             {
-              
-                string result = Global.GIL.CheckYolo(Global.model.Vision.Score);
-                string[] numbers = result.Split(',');
-                if(numbers.Length > 2)
+                    
+                   
+                    //  Native.GrabBasler();
+                   
+               lock(this)
                 {
-                    Global.model.Result.Wires = long.Parse(numbers[0]);
-                    Global.model.Result.Counter = int.Parse(numbers[1]);
-                    Global.model.Result.Cycle = int.Parse(numbers[2]);
-                    return Ok(new { value = Global.model.Result });
-                }
-             else
-                    return Ok(new { value = result });
+                   
+                        Global.CCD.GrabBasler();
+                        string result = Global.GIL.CheckYolo(Global.model.Vision.Score);
+
+                    string[] numbers = result.Split(',');
+                    if (numbers.Length > 2)
+                    {
+                        Global.model.Result.Wires = long.Parse(numbers[0]);
+                        Global.model.Result.Counter = int.Parse(numbers[1]);
+                        Global.model.Result.Cycle = int.Parse(numbers[2]);
+                        return Ok(new { value = Global.model.Result });
+                    }
+                    else
+                    {
+                        Console.WriteLine(result);
+                        return Ok(new { value = result });
+
+                      
+
+                    }
+             
+        }
+                return Ok("");
+
+
+
 
             }
             catch (Exception ex) 
@@ -247,23 +295,68 @@ namespace BeeAPI.Controllers
 
             return ResponseMessage(response);
         }
+        HttpResponseMessage response;
+        bool IsRead = false;
         [HttpGet]
         [Route("GrabRaw")]
-        public IHttpActionResult GrabRaw()
-        {
-            Native.GrabBasler();
-            byte[] imageData = GetImg.ByteRaw();
 
-            if (imageData == null || imageData.Length == 0)
+        public async Task< IHttpActionResult> GrabRaw()
+        {
+            lock (this)
             {
-                return BadRequest("Không có dữ liệu hình ảnh.");
+                if (IsRead)
+                    return Ok("Wait");
+                IsRead = true;
+
+                //Native.GrabBasler();
+                Global.CCD.GrabBasler();
+
+                byte[] imageData = GetImg.ByteRaw();
+
+                if (imageData == null || imageData.Length == 0)
+                {
+                    IsRead = false;
+                    return BadRequest("Không có dữ liệu hình ảnh.");
+                }
+
+
+                try
+                {
+                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+                 //     HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+
+                    // Thiết lập các header để vô hiệu hóa cache
+                    response.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+                    {
+                        NoCache = true,
+                        NoStore = true,
+                        MustRevalidate = true
+                    };
+                    response.Headers.Pragma.Add(new System.Net.Http.Headers.NameValueHeaderValue("no-cache"));
+                    response.Headers.Add("Expires", "0");
+                    response.Content = new ByteArrayContent(imageData);
+                
+                    //IsRead = false;
+                    response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+                    // Hủy tham chiếu đối tượng để garbage collector thu hồi
+                    //    mediaType = null;
+
+                    // Thực thi garbage collection (chưa chắc sẽ thu hồi ngay)
+                    return ResponseMessage(response);
+
+                }
+                finally
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    Console.WriteLine("Release");
+                    // Giải phóng tài nguyên khi xong
+                    //   // Nếu đối tượng implement IDisposable
+                }
             }
-            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new ByteArrayContent(imageData)
-            };
-            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
-            return ResponseMessage(response);
+          //  return result;
+              //  return Ok(imageData);
+            
         }
         [HttpGet]
         [Route("ScanCam")]
@@ -271,12 +364,15 @@ namespace BeeAPI.Controllers
         {
             try
             {
-                List<string> cameraList = Global.CCD.ScanBasler();
-                if (cameraList == null || cameraList.Count == 0)
+                lock (this)
                 {
-                    return StatusCode(System.Net.HttpStatusCode.NotFound);// new { message = "Không tìm thấy camera nào." } );
+                    List<string> cameraList = Global.CCD.ScanBasler();
+                    if (cameraList == null || cameraList.Count == 0)
+                    {
+                        return StatusCode(System.Net.HttpStatusCode.NotFound);// new { message = "Không tìm thấy camera nào." } );
+                    }
+                    return Ok(new { cameras = cameraList });
                 }
-                return Ok(new { cameras = cameraList });
             }
             catch (Exception ex)
             {
@@ -293,8 +389,11 @@ namespace BeeAPI.Controllers
             }
             try
             {
-                string result = Global.CCD.ConnectBasler(nameCam);
-                return Ok(new { message = result ?? "Đã kết nối camera thành công." });
+                lock (this)
+                {
+                    string result = Global.CCD.ConnectBasler(nameCam);
+                    return Ok(new { message = result ?? "Đã kết nối camera thành công." });
+                }
             }
             catch (Exception ex)
             {

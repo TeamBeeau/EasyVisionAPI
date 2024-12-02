@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using IndustrialNetworks.ModbusCore.DataTypes;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +13,16 @@ namespace BeeAPI
          public static byte[]  ByteRaw()
         {
             int width=0, height=0, type=0;
-            IntPtr intPtr =Native. GetImage(ref height, ref width, ref type);
-            if (intPtr == IntPtr.Zero)
+            byte[] imageData = Global.CCD.GetRaw();
+
+            // IntPtr intPtr =Native. GetImage(ref height, ref width, ref type);
+            if (imageData.Length==0)
             {
                 throw new InvalidOperationException("GetImage trả về con trỏ null.");
             }
             unsafe
             {
-                Mat raw = new Mat(height, width, type, intPtr);
+                Mat raw = new Mat(Global.CCD.rows, Global.CCD.cols, Global.CCD.typ, imageData);
                 byte[] byteArray = raw.ImEncode(".png");
                 return byteArray;
             }
@@ -27,14 +30,16 @@ namespace BeeAPI
         public static byte[] ByteResult()
         {
             int width = 0, height = 0, type = 0;
-            IntPtr intPtr = Native.GetResultImage(ref height, ref width, ref type);
-            if (intPtr == IntPtr.Zero)
+            byte[] imageData = Global.CCD.GetResult();
+
+            // IntPtr intPtr =Native. GetImage(ref height, ref width, ref type);
+            if (imageData.Length == 0)
             {
                 throw new InvalidOperationException("GetImage trả về con trỏ null.");
             }
             unsafe
             {
-                Mat raw = new Mat(height, width, type, intPtr);
+                Mat raw = new Mat(Global.CCD.rows, Global.CCD.cols, Global.CCD.typ, imageData);
                 byte[] byteArray = raw.ImEncode(".png");
                 return byteArray;
             }

@@ -43,7 +43,7 @@ System::String^ Yolo::IniGIL() {
 		
 	
 		
-		//std::lock_guard<std::mutex> lock(gilmutex);
+		//std::unique_lock<std::mutex> lock(gilmutex);
 		//py::gil_scoped_acquire acquire;
 		//gil_scoped_acquire_local gil_acquire;
 		//	py::gil_scoped_acquire acquire;
@@ -52,6 +52,7 @@ System::String^ Yolo::IniGIL() {
 		py::module processor_module = py::module::import("yolo");
 		_yolo = processor_module.attr("ObjectDetector")();
 		_yolo.attr("load_model")(pathModel);
+		//lock.unlock();
 		//py::gil_scoped_release release;
 		//PyEval_SaveThread
 		//PylonInitialize();
@@ -107,7 +108,7 @@ std::tuple<py::list, py::list> GIL(float Score)
 		
 	
 
-		std::lock_guard<std::mutex>lock(gilmutex);
+		
 		py::gil_scoped_release release;
 		py::gil_scoped_acquire acquire;
 	
@@ -128,6 +129,7 @@ std::tuple<py::list, py::list> GIL(float Score)
 		py::list boxes = result_tuple[0].cast<py::list>();
 		py::list scores = result_tuple[1].cast<py::list>();
 		lisRS = std::make_tuple(boxes, scores); IsCheking = false;
+		py::gil_scoped_release release;
 		return lisRS;
 	}
 	
@@ -144,20 +146,28 @@ std::tuple<py::list, py::list> GIL(float Score)
 }
 System::String^ Yolo::CheckYolo(float Score) {
 	if (IsCheking)
-		return FALSE;
+		return "WAIT";
 	if (PyGILState_Check() == 0)
-	{
+	{//_yolo.attr("load_model")(pathModel);
+	//	PyGILState_Ensure();
+	//	FinalizeGIL();
+		//IniGIL();
 		return FALSE;
 	}
 	if (!Py_Initialize || !_yolo)
 	{
-		
+	
 		return FALSE;
 	}
 	double startTime = clock();
+	std::unique_lock<std::mutex> lock(gilmutex);
+	//std::lock_guard<std::mutex>lock(gilmutex);
 	std::tuple<py::list, py::list> result=GIL(Score);
+	
+	std::cout << "Unlocked by thread: " << std::this_thread::get_id() << std::endl;
+	lock.unlock();
 	matResult = matProcess.clone();
-	std::lock_guard<std::mutex>lock(gilmutex);
+	//
 	
 	int numDetected = 0;
 	float pixelCable = 0, sumOfAll = 0;

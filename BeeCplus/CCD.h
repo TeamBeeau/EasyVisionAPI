@@ -5,7 +5,7 @@
 #include <map>
 #include <unordered_map>
 #include <string>
-
+using namespace System;
 namespace BeeCplus {
 	struct Device {
 
@@ -36,12 +36,17 @@ namespace BeeCplus {
 
 	public ref class CCD
 	{
+	public:System::String^ GetPara(System::String^ name);
+	public:System::String^ SetPara(System::String^ name, float value);
+	public:cli::array<Byte>^ GetRaw();
+	public:cli::array<Byte>^ GetResult();
+	public:System::String^ GrabBasler();
 	public: bool IsScan ;
 	List<System::String^>^ listNameCCD;
 	public:float cycle = 0;
 	public:int numERR = 0;
 	public:bool IsErrCCD = false;
-	public:int  colCCD = 1000, rowCCD = 200;
+	public:int  cols = 1000, rows = 200,typ=0;
 	public:int colCrop, rowCrop;
 
 	public:void ReadRaw(bool IsHist);
