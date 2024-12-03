@@ -1,6 +1,6 @@
 #pragma once
 #include "G.h"
-
+ #define PYBIND11_NO_ASSERT_GIL_HELD_INCREF_DECREF 
 namespace BeeCplus {
 	
 	public ref class Yolo

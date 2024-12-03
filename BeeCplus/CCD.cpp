@@ -64,32 +64,64 @@ void SetImage(int indexTool, uchar* uc, int image_rows, int image_cols, int imag
 cli::array<Byte>^ CCD::GetRaw()
 {
 	
+	//std::lock_guard<std::mutex> lock(gilmutex);
+	//py::gil_scoped_acquire acquire;
+	cli::array<Byte>^ byteArray;
+	//if (PyGILState_Check() == 0)
+	//{
 
-	// Create a byte array in managed memory
-	cli::array<Byte>^ byteArray = gcnew cli::array<Byte>(matRaw.total() * matRaw.elemSize());
-	cols = matRaw.cols;
-	rows = matRaw.rows;
-	typ = matRaw.type();
-	// Pin the array to copy data
-	pin_ptr<Byte> pinnedArray = &byteArray[0];
-	memcpy(pinnedArray, matRaw.data, matRaw.total() * matRaw.elemSize());
+
+	//	//
+
+	//	return  byteArray;
+	//}
+
+	//Py_BEGIN_ALLOW_THREADS
+		cv::imwrite("raw.png", matRaw);
+	//Py_END_ALLOW_THREADS
+	//// Create a byte array in managed memory
+	//cli::array<Byte>^ byteArray = gcnew cli::array<Byte>(matRaw.total() * matRaw.elemSize());
+	//cols = matRaw.cols;
+	//rows = matRaw.rows;
+	//typ = matRaw.type();
+	//// Pin the array to copy data
+	//pin_ptr<Byte> pinnedArray = &byteArray[0];
+	//memcpy(pinnedArray, matRaw.data, matRaw.total() * matRaw.elemSize());
 
 	return byteArray;
 }
 cli::array<Byte>^ CCD::GetResult()
 {
+	//std::lock_guard<std::mutex> lock(gilmutex);
+	//py::gil_scoped_acquire acquire;
+	cli::array<Byte>^ byteArray;
+	//if (PyGILState_Check() == 0)
+	//{
+	//	
 
+	//		//
+	//	
+	//		return  byteArray;
+	//}
+	//
+	//Py_BEGIN_ALLOW_THREADS
+		cv::imwrite("rs.png", matResult);
 
+		//std::lock_guard<std::mutex>lock(gilmutex);
 	// Create a byte array in managed memory
-	cli::array<Byte>^ byteArray = gcnew cli::array<Byte>(matResult.total() * matResult.elemSize());
-	cols = matResult.cols;
-	rows = matResult.rows;
-	typ = matResult.type();
-	// Pin the array to copy data
-	pin_ptr<Byte> pinnedArray = &byteArray[0];
-	memcpy(pinnedArray, matResult.data, matResult.total() * matResult.elemSize());
-
+	//byteArray = gcnew cli::array<Byte>(matResult.total() * matResult.elemSize());
+	//cols = matResult.cols;
+	//rows = matResult.rows;
+	//typ = matResult.type();
+	//// Pin the array to copy data
+	//pin_ptr<Byte> pinnedArray = &byteArray[0];
+	//memcpy(pinnedArray, matResult.data, matResult.total() * matResult.elemSize());
+	//
+	//Py_END_ALLOW_THREADS
+	//	py::gil_scoped_release release;
 	return byteArray;
+	
+		
 }
 extern "C" __declspec(dllexport) uchar* GetImage(int* rows, int* cols, int* Type)
 {
@@ -331,7 +363,7 @@ System::String^ CCD::GrabBasler() {
 		return "";
 	//std::lock_guard<std::mutex>lock(gilmutex);
 	IsCap = true;
-	//std::unique_lock<std::mutex> lock(gilmutex);
+//	std::unique_lock<std::mutex> lock(gilmutex);
 	matRaw.release();
 	matProcess.release();
 	matResult.release();

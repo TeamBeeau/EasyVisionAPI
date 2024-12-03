@@ -22,13 +22,13 @@ System::String^ Yolo::FinalizeGIL() {
 		std::cerr << "Python initialization failed!" << std::endl;
 		return "Python initialization failed!";
 	}
-//	Py_Finalize();
-// py::gil_scoped_release release;
-	///std::lock_guard<std::mutex> lock(gilmutex);
-	python_terminated = true;
+	_yolo.attr("close")();
+	Py_FinalizeEx();
+
+	//python_terminated = true;
 	nt.notify_all();
 
-	py::finalize_interpreter();
+	//py::finalize_interpreter();
 	return SUCCESS;
 }
 System::String^ Yolo::IniStart()
@@ -39,11 +39,12 @@ System::String^ Yolo::IniStart()
 System::String^ Yolo::IniGIL() {
 	try
 	{
+		std::lock_guard<std::mutex> lock(gilmutex);
 		Py_Initialize();
 		gil_scoped_acquire_local gil_acquire;
 
-		
-		std::lock_guard<std::mutex>lock(gilmutex);
+	//	std::lock_guard<std::mutex> lock(gilmutex);
+	//std::lock_guard<std::mutex>lock(gilmutex);
 		
 		//std::unique_lock<std::mutex> lock(gilmutex);
 		//py::gil_scoped_acquire acquire;
@@ -54,6 +55,7 @@ System::String^ Yolo::IniGIL() {
 		py::module processor_module = py::module::import("yolo");
 		_yolo = processor_module.attr("ObjectDetector")();
 		_yolo.attr("load_model")(pathModel);
+		auto ptr = std::make_unique<int[]>(10);
 		//lock.unlock();
 		//py::gil_scoped_release release;
 		//PyEval_SaveThread
@@ -97,7 +99,7 @@ System::String^ Yolo::ImportRaw()
 bool IsCheking = false;
 std::tuple<py::list, py::list> GIL(float Score)
 {
-//	std::lock_guard<std::mutex>lock(gilmutex);
+	//std::lock_guard<std::mutex>lock(gilmutex);
 	IsCheking = true;
 	std::string status = "";
 	try
@@ -111,8 +113,8 @@ std::tuple<py::list, py::list> GIL(float Score)
 	
 
 		
-		py::gil_scoped_release release;
-		py::gil_scoped_acquire acquire;
+	//	py::gil_scoped_release release;
+	//	py::gil_scoped_acquire acquire;
 	
 
 	// Chuyển đổi OpenCV image sang numpy array để gửi tới Python
@@ -131,7 +133,8 @@ std::tuple<py::list, py::list> GIL(float Score)
 		py::list boxes = result_tuple[0].cast<py::list>();
 		py::list scores = result_tuple[1].cast<py::list>();
 		lisRS = std::make_tuple(boxes, scores); IsCheking = false;
-		py::gil_scoped_release release;
+		//py::gil_scoped_release release;
+		//auto ptr = std::make_unique<int[]>(10);
 		return lisRS;
 	}
 	
@@ -162,11 +165,17 @@ System::String^ Yolo::CheckYolo(float Score) {
 		return FALSE;
 	}
 	double startTime = clock();
-	//std::unique_lock<std::mutex> lock(gilmutex);
-	std::lock_guard<std::mutex>lock(gilmutex);
+	// Khóa mutex để đảm bảo không có luồng khác truy cập GIL đồng thời
+	std::lock_guard<std::mutex> lock(gilmutex);
+
+	// Lấy GIL để chạy mã Python
+	py::gil_scoped_acquire acquire;
+//std::unique_lock<std::mutex> lock(gilmutex);
+//	std::lock_guard<std::mutex>lock(gilmutex);
 	std::tuple<py::list, py::list> result=GIL(Score);
 	
-	std::cout << "Unlocked by thread: " << std::this_thread::get_id() << std::endl;
+//	std::cout << "Unlocked by thread: " << std::this_thread::get_id() << std::endl;
+	
 	//lock.unlock();
 	matResult = matProcess.clone();
 	//
@@ -239,6 +248,7 @@ System::String^ Yolo::CheckYolo(float Score) {
 				cv::rectangle(matResult, { x1, y1 }, { x2, y2 }, color, 2);
 				cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 - 5 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1);
 			}
+//			py::gil_scoped_release release;
 
 			// Kiểm tra nếu không phát hiện vật thể
 			if (numDetected == 0) {
@@ -262,6 +272,7 @@ System::String^ Yolo::CheckYolo(float Score) {
 		return gcnew System::String(status.c_str());
 	int cycle = int(clock() - startTime);
 	return gcnew System::String("0," +numDetected + "," + cycle + ",0");
+	
 	///gil_acquire1.~gil_scoped_acquire_local();
 //	gil_acquire.~gil_scoped_acquire_local();
 }

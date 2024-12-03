@@ -16,7 +16,6 @@ namespace BeeAPI
             unsafe
             {
 
-              
                     return Yolo.IniGIL();
                 
             }
@@ -40,6 +39,7 @@ namespace BeeAPI
         }
         public String  CheckYolo(float Score)
         {
+
            
                 //   Yolo.ImportRaw();
                 return Yolo.CheckYolo(Score);

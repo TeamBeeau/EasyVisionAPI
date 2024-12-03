@@ -3,7 +3,7 @@
 //using namespace BeeCplus;
 namespace BeeCplus
 {
-
+	
 	std::condition_variable nt;
 	bool python_initialized = false;
 	bool python_terminated = false;

@@ -9,6 +9,7 @@ namespace BeeAPI
  
     public struct Global
     {
+        public static byte[] imageData;
         public static BeeCplus.CCD CCD = new BeeCplus.CCD();
         public static GIL GIL = new GIL();
         public static Model model = new Model();

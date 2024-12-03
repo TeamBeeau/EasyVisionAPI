@@ -18,8 +18,8 @@ namespace BeeAPI
         static void Main(string[] args)
         {
             string baseAddress = "http://localhost:8080/";
-          //  ThreadPool.SetMaxThreads(1, 1);
-           // ThreadPool.SetMinThreads(1, 1);
+            ThreadPool.SetMaxThreads(1, 1);
+            ThreadPool.SetMinThreads(1, 1);
 
             using (WebApp.Start<Startup>(url: baseAddress))
             {
@@ -33,8 +33,8 @@ namespace BeeAPI
              //  tmIniTial.Enabled = true;
                 Console.WriteLine("Press Enter to exit...");
               Console.ReadLine();
-                Global.CCD.DisconnectBasler();
-                Global.GIL.FinalizeGIL();
+               // Global.CCD.DisconnectBasler();
+                //Global.GIL.FinalizeGIL();
               
             }
         }
