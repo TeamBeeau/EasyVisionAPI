@@ -10,7 +10,7 @@ namespace BeeCplus {
 	public:System::String^ FinalizeGIL();
 	public:System::String^ IniGIL();
 	public:System::String^ IniStart();
-
+	public:	System::String^ Reset();
 	//public:System::String^ TestYolo(float Score);
 	public:System::String^ CheckYolo(float Score);
 

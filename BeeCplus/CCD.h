@@ -46,7 +46,7 @@ namespace BeeCplus {
 	public:float cycle = 0;
 	public:int numERR = 0;
 	public:bool IsErrCCD = false;
-	public:int  cols = 1000, rows = 200,typ=0;
+	public:int  cols = 1000, rows = 100,typ=0, exposures = 600;
 	public:int colCrop, rowCrop;
 
 	public:void ReadRaw(bool IsHist);

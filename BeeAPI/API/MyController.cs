@@ -16,7 +16,7 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
 namespace BeeAPI.Controllers
 {
-    
+
     [RoutePrefix("api/bee")]
     public class MyController : ApiController
     {
@@ -25,11 +25,11 @@ namespace BeeAPI.Controllers
 
         [HttpGet]
         [Route("SetVision")]
-        public IHttpActionResult SetVision( string vision,  string value)
+        public IHttpActionResult SetVision(string vision, string value)
         {
             if (string.IsNullOrWhiteSpace(vision) || string.IsNullOrWhiteSpace(value))
             {
-                return BadRequest("Tên thuộc tính vision và giá trị là bắt buộc và không được để trống." );
+                return BadRequest("Tên thuộc tính vision và giá trị là bắt buộc và không được để trống.");
             }
             lock (this)
             {
@@ -45,7 +45,7 @@ namespace BeeAPI.Controllers
         }
         [HttpGet]
         [Route("SetPara")]
-        public IHttpActionResult SetPara( string para,  string value)
+        public IHttpActionResult SetPara(string para, string value)
         {
             lock (this)
             {
@@ -53,6 +53,13 @@ namespace BeeAPI.Controllers
 
                 return Ok(new { message = result ?? "Không nhận được phản hồi từ SetPara" });
             }
+        }
+        [HttpGet]
+        [Route("Reset")]
+        public IHttpActionResult Reset()
+        {
+         string rs =   Global.GIL.Yolo.Reset();
+            return Ok(new { message = rs });
         }
         [HttpGet]
         [Route("GetVision")]
@@ -76,7 +83,7 @@ namespace BeeAPI.Controllers
         }
         [HttpGet]
         [Route("GetParaModel")]
-        public IHttpActionResult GetParaModel( string para)
+        public IHttpActionResult GetParaModel(string para)
         {
             try
             {
@@ -88,12 +95,12 @@ namespace BeeAPI.Controllers
             }
             catch
             {
-                return BadRequest($"Sai định dạng" );
+                return BadRequest($"Sai định dạng");
             }
         }
         [HttpGet]
         [Route("GetPara")]
-        public IHttpActionResult GetPara( string para)
+        public IHttpActionResult GetPara(string para)
         {
             try
             {
@@ -105,16 +112,16 @@ namespace BeeAPI.Controllers
             }
             catch
             {
-                return BadRequest($"Sai định dạng" );
+                return BadRequest($"Sai định dạng");
             }
         }
         [HttpGet]
         [Route("SaveModel")]
-        public IHttpActionResult SaveModel( string nameModel)
+        public IHttpActionResult SaveModel(string nameModel)
         {
             if (string.IsNullOrWhiteSpace(nameModel))
             {
-                return BadRequest("Tên của mô hình là bắt buộc và không được để trống." );
+                return BadRequest("Tên của mô hình là bắt buộc và không được để trống.");
             }
 
             try
@@ -131,16 +138,16 @@ namespace BeeAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Lưu mô hình thất bại: {ex.Message}" );
+                return BadRequest($"Lưu mô hình thất bại: {ex.Message}");
             }
         }
         [HttpGet]
         [Route("LoadModel")]
-        public IHttpActionResult LoadModel( string nameModel)
+        public IHttpActionResult LoadModel(string nameModel)
         {
             if (string.IsNullOrWhiteSpace(nameModel))
             {
-                return BadRequest("Tên của mô hình là bắt buộc và không được để trống." );
+                return BadRequest("Tên của mô hình là bắt buộc và không được để trống.");
             }
             try
             {
@@ -163,7 +170,7 @@ namespace BeeAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Tải mô hình thất bại: {ex.Message}" );
+                return BadRequest($"Tải mô hình thất bại: {ex.Message}");
             }
         }
         [HttpGet]
@@ -175,71 +182,72 @@ namespace BeeAPI.Controllers
                 try
                 {
                     try
-            {
-               
+                    {
+
                         var result = Global.GIL.IniGIL();
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
                         Console.WriteLine(result.ToString());
                         if (result.Contains("SUCCESS"))
-                       
-                          
+
+
                             return Ok(new { message = "Python initialized and connected successfully." });
                         else
                             return StatusCode(System.Net.HttpStatusCode.RequestTimeout);
 
 
 
-                     
+
 
 
 
                     }
 
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                return BadRequest($"Error Python: {ex.Message}" );
-            }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                        return BadRequest($"Error Python: {ex.Message}");
+                    }
                 }
                 finally
                 {
-                  //  _mutex.ReleaseMutex();
+                    //  _mutex.ReleaseMutex();
                 }
-            
-              return Ok("");
+
+            return Ok("");
         }
-       
-       [HttpGet]
+
+        [HttpGet]
         [Route("TestYolo")]
         public IHttpActionResult TestYolo(float Score)
         {
-            lock(syncLock)
+            lock (syncLock)
 
             {
                 string result = Global.GIL.TestYolo(Score);
 
-                    string[] numbers = result.Split(',');
-                    if (numbers.Length > 2)
-                    {  GetImg.ByteResult();
-                       
-                        Global.model.Result.Wires = long.Parse(numbers[0]);
-                        Global.model.Result.Counter = int.Parse(numbers[1]);
-                        Global.model.Result.Cycle = int.Parse(numbers[2]);
-                        Console.WriteLine($"Response: {result}");
-                        return Ok(new { value = Global.model.Result });
+                string[] numbers = result.Split(',');
+                if (numbers.Length > 2)
+                {
+                    GetImg.ByteResult();
 
-                    }
-
+                    Global.model.Result.Wires = long.Parse(numbers[0]);
+                    Global.model.Result.Counter = int.Parse(numbers[1]);
+                    Global.model.Result.Cycle = int.Parse(numbers[2]);
                     Console.WriteLine($"Response: {result}");
-                    return Ok(result);
+                    return Ok(new { value = Global.model.Result });
+
                 }
-               
 
-
-            
-                return Ok("");
+                Console.WriteLine($"Response: {result}");
+                return Ok(result);
             }
+
+
+
+
+            return Ok("");
+        }
 
         [HttpGet]
         [Route("GrabCheck")]
@@ -303,42 +311,42 @@ namespace BeeAPI.Controllers
         public IHttpActionResult Dispose()
         {
 
-           
-                try
-                {
 
-                    // response.Dispose();
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    Console.WriteLine("Release");
+            try
+            {
 
-                }
-                finally
-                {
-                  //  _mutex.ReleaseMutex();
-                }
-            
-                //  }
+                // response.Dispose();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                Console.WriteLine("Release");
 
-                return Ok("OK");
+            }
+            finally
+            {
+                //  _mutex.ReleaseMutex();
+            }
+
+            //  }
+
+            return Ok("OK");
         }
-          [HttpGet]
+        [HttpGet]
         [Route("ImageResult")]
         public IHttpActionResult ImageResult()
         {
-          
 
-            
-            
-           lock(syncLock)
+
+
+
+            lock (syncLock)
             {
                 GetImg.ByteResult();
                 //if (Global.imageData == null || Global.imageData.Length == 0)
                 //    {
                 //        return BadRequest("Không có dữ liệu hình ảnh.");
                 //    }
-                    try
-                    {
+                try
+                {
                     // Dùng FileResult để tránh các lỗi đồng bộ
                     //var response = new HttpResponseMessage(HttpStatusCode.OK)
                     //{
@@ -347,8 +355,8 @@ namespace BeeAPI.Controllers
                     //response.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
 
                     return Ok(new { value = "OK" });// ResponseMessage(response);
-                    //response = new HttpResponseMessage(HttpStatusCode.OK);
-                    //    //     HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+                                                    //response = new HttpResponseMessage(HttpStatusCode.OK);
+                                                    //    //     HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
                     //    // Thiết lập các header để vô hiệu hóa cache
                     //    //response.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
@@ -363,23 +371,23 @@ namespace BeeAPI.Controllers
 
                     //    //IsRead = false;
                     //    response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
-                        // Hủy tham chiếu đối tượng để garbage collector thu hồi
-                        //    mediaType = null;
+                    // Hủy tham chiếu đối tượng để garbage collector thu hồi
+                    //    mediaType = null;
 
-                        // Thực thi garbage collection (chưa chắc sẽ thu hồi ngay)
-                       // return ResponseMessage(response);
+                    // Thực thi garbage collection (chưa chắc sẽ thu hồi ngay)
+                    // return ResponseMessage(response);
 
-                    }
-                    finally
-                    {
-
-                        // Giải phóng tài nguyên khi xong
-                        //   // Nếu đối tượng implement IDisposable
-                    }
                 }
-                
-           
-            
+                finally
+                {
+
+                    // Giải phóng tài nguyên khi xong
+                    //   // Nếu đối tượng implement IDisposable
+                }
+            }
+
+
+
             //  }
 
             return Ok("OK");
@@ -422,7 +430,7 @@ namespace BeeAPI.Controllers
             }
             finally
             {
-              
+
                 // Giải phóng tài nguyên khi xong
                 //   // Nếu đối tượng implement IDisposable
             }
@@ -434,24 +442,24 @@ namespace BeeAPI.Controllers
 
         public IHttpActionResult GrabRaw()
         {
-           
-
-                    if (IsRead)
-                        return Ok("Wait");
-                    IsRead = true;
-                    //Native.GrabBasler();
-                    Global.CCD.GrabBasler();
-                    byte[] imageData = GetImg.ByteRaw();
-
-                    //if (imageData == null || imageData.Length == 0)
-                    //{
-                    //    IsRead = false;
-                    //    return BadRequest("Không có dữ liệu hình ảnh.");
-                    //}
 
 
-                    try
-                    {
+            if (IsRead)
+                return Ok("Wait");
+            IsRead = true;
+            //Native.GrabBasler();
+            Global.CCD.GrabBasler();
+            byte[] imageData = GetImg.ByteRaw();
+
+            //if (imageData == null || imageData.Length == 0)
+            //{
+            //    IsRead = false;
+            //    return BadRequest("Không có dữ liệu hình ảnh.");
+            //}
+
+
+            try
+            {
                 return Ok(new { value = "OK" });
                 // response = new HttpResponseMessage(HttpStatusCode.OK);
                 ////     HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
@@ -476,22 +484,22 @@ namespace BeeAPI.Controllers
                 //return ResponseMessage(response);
 
             }
-                    finally
-                    {
-                       // GC.Collect();
-                        //GC.WaitForPendingFinalizers();
-                      //  Console.WriteLine("Release");
-                        // Giải phóng tài nguyên khi xong
-                        //   // Nếu đối tượng implement IDisposable
-                    }
-                
+            finally
+            {
+                // GC.Collect();
+                //GC.WaitForPendingFinalizers();
+                //  Console.WriteLine("Release");
+                // Giải phóng tài nguyên khi xong
+                //   // Nếu đối tượng implement IDisposable
+            }
 
-            
-        
-            
-          //  return result;
-               return Ok("FAIL");
-            
+
+
+
+
+            //  return result;
+            return Ok("FAIL");
+
         }
         [HttpGet]
         [Route("ScanCam")]
@@ -511,16 +519,16 @@ namespace BeeAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Lỗi khi quét camera: {ex.Message}" );
+                return BadRequest($"Lỗi khi quét camera: {ex.Message}");
             }
         }
         [HttpGet]
         [Route("ConnectCam")]
-        public IHttpActionResult ConnectCam( string nameCam)
+        public IHttpActionResult ConnectCam(string nameCam)
         {
             if (string.IsNullOrWhiteSpace(nameCam))
             {
-                return BadRequest("Tên camera là bắt buộc và không được để trống." );
+                return BadRequest("Tên camera là bắt buộc và không được để trống.");
             }
             try
             {
@@ -532,7 +540,7 @@ namespace BeeAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Lỗi khi kết nối camera: {ex.Message}" );
+                return BadRequest($"Lỗi khi kết nối camera: {ex.Message}");
             }
         }
         [HttpGet]
@@ -556,12 +564,12 @@ namespace BeeAPI.Controllers
                 }
                 finally
                 {
-                   // _mutex.ReleaseMutex();
+                    // _mutex.ReleaseMutex();
                 }
 
             }
             return Ok("FAIL");
         }
-       
+
     }
 }
