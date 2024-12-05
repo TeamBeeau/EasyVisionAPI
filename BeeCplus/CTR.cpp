@@ -115,77 +115,77 @@ Rect getROI(const Mat& img) {
 	return Rect(roi_x, roi_y, 800, 50);
 }
 
-Mat preImage(const Mat& img) {
-	Mat mBlurImage;
-	medianBlur(img, mBlurImage, 3);
-	Mat blurImage;
-	blur(mBlurImage, blurImage, cv::Size(3, 3));
-	Mat thresholdImage;
-	//threshold(blurredImage, thresholdImage, 120, 255, THRESH_BINARY_INV);
-	threshold(blurImage, thresholdImage, 80, 255, THRESH_BINARY);
-	bitwise_not(thresholdImage, thresholdImage);
-	Mat mono8Image = Mat(thresholdImage.size(), CV_8UC1, Scalar(0));
-	rectangle(mono8Image, Rect(0, 0, img.cols, img.rows), Scalar(255), -1);
-	Mat result;
-	bitwise_and(mono8Image, thresholdImage, result);
-	return result;
-}
-
-float meaSure(const Mat& mat1, const Rect& roi, cv::Point& midpoint1, cv::Point& midpoint2) {
-	int xmin_top = mat1.cols - 1, xmax_top = 0;
-	int xmin_bottom = mat1.cols - 1, xmax_bottom = 0;
-
-	for (int x = 0; x < mat1.cols; ++x) {
-		if (mat1.at<uchar>(0, x) == 255) {
-			xmin_top = min(xmin_top, x);
-			xmax_top = max(xmax_top, x);
-		}
-		if (mat1.at<uchar>(mat1.rows - 1, x) == 255) {
-			xmin_bottom = min(xmin_bottom, x);
-			xmax_bottom = max(xmax_bottom, x);
-		}
-	}
-
-	if (xmin_top == mat1.cols - 1 || xmax_top == 0 ||
-		xmin_bottom == mat1.cols - 1 || xmax_bottom == 0) {
-		return -1;
-	}
-
-	cv::Point pt1(xmin_top + roi.x, roi.y);
-	cv::Point pt2(xmax_top + roi.x, roi.y);
-	cv::Point pt3(xmin_bottom + roi.x, roi.y + roi.height - 1);
-	cv::Point pt4(xmax_bottom + roi.x, roi.y + roi.height - 1);
-
-	midpoint1 = cv::Point((pt1.x + pt3.x) / 2, (pt1.y + pt3.y) / 2);
-	midpoint2 = cv::Point((pt2.x + pt4.x) / 2, (pt2.y + pt4.y) / 2);
-
-	return sqrt(pow(midpoint2.x - midpoint1.x, 2) + pow(midpoint2.y - midpoint1.y, 2));
-}
-
-void showResult(Mat& img, int distance, int cable) {
-	string cableText = "Cable: " + to_string(cable);
-	string distanceText = "Width: " + to_string(distance);
-	putText(img, distanceText, cv::Point(10, img.rows - 40), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(0, 255, 0), 2);
-	putText(img, cableText, cv::Point(10, img.rows - 10), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(0, 255, 0), 2);
-}
-
-int calib(Mat& img, int cable) {
-	Rect roi = getROI(img);
-	//Mat roi_img(img(roi));
-	//imshow("", roi_img);
-
-	Mat newImage = preImage(img);
-	//imshow("calib", newImage);
-	cv::Point midpoint1, midpoint2;
-	int distance = meaSure(newImage, roi, midpoint1, midpoint2);
-
-	if (distance == -1) {
-		return -1;
-	}
-
-	int result = distance / cable;
-	return result;
-}
+//Mat preImage(const Mat& img) {
+//	Mat mBlurImage;
+//	medianBlur(img, mBlurImage, 3);
+//	Mat blurImage;
+//	blur(mBlurImage, blurImage, cv::Size(3, 3));
+//	Mat thresholdImage;
+//	//threshold(blurredImage, thresholdImage, 120, 255, THRESH_BINARY_INV);
+//	threshold(blurImage, thresholdImage, 80, 255, THRESH_BINARY);
+//	bitwise_not(thresholdImage, thresholdImage);
+//	Mat mono8Image = Mat(thresholdImage.size(), CV_8UC1, Scalar(0));
+//	rectangle(mono8Image, Rect(0, 0, img.cols, img.rows), Scalar(255), -1);
+//	Mat result;
+//	bitwise_and(mono8Image, thresholdImage, result);
+//	return result;
+//}
+//
+//float meaSure(const Mat& mat1, const Rect& roi, cv::Point& midpoint1, cv::Point& midpoint2) {
+//	int xmin_top = mat1.cols - 1, xmax_top = 0;
+//	int xmin_bottom = mat1.cols - 1, xmax_bottom = 0;
+//
+//	for (int x = 0; x < mat1.cols; ++x) {
+//		if (mat1.at<uchar>(0, x) == 255) {
+//			xmin_top = min(xmin_top, x);
+//			xmax_top = max(xmax_top, x);
+//		}
+//		if (mat1.at<uchar>(mat1.rows - 1, x) == 255) {
+//			xmin_bottom = min(xmin_bottom, x);
+//			xmax_bottom = max(xmax_bottom, x);
+//		}
+//	}
+//
+//	if (xmin_top == mat1.cols - 1 || xmax_top == 0 ||
+//		xmin_bottom == mat1.cols - 1 || xmax_bottom == 0) {
+//		return -1;
+//	}
+//
+//	cv::Point pt1(xmin_top + roi.x, roi.y);
+//	cv::Point pt2(xmax_top + roi.x, roi.y);
+//	cv::Point pt3(xmin_bottom + roi.x, roi.y + roi.height - 1);
+//	cv::Point pt4(xmax_bottom + roi.x, roi.y + roi.height - 1);
+//
+//	midpoint1 = cv::Point((pt1.x + pt3.x) / 2, (pt1.y + pt3.y) / 2);
+//	midpoint2 = cv::Point((pt2.x + pt4.x) / 2, (pt2.y + pt4.y) / 2);
+//
+//	return sqrt(pow(midpoint2.x - midpoint1.x, 2) + pow(midpoint2.y - midpoint1.y, 2));
+//}
+//
+//void showResult(Mat& img, int distance, int cable) {
+//	string cableText = "Cable: " + to_string(cable);
+//	string distanceText = "Width: " + to_string(distance);
+//	putText(img, distanceText, cv::Point(10, img.rows - 40), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(0, 255, 0), 2);
+//	putText(img, cableText, cv::Point(10, img.rows - 10), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(0, 255, 0), 2);
+//}
+//
+//int calib(Mat& img, int cable) {
+//	Rect roi = getROI(img);
+//	//Mat roi_img(img(roi));
+//	//imshow("", roi_img);
+//
+//	Mat newImage = preImage(img);
+//	//imshow("calib", newImage);
+//	cv::Point midpoint1, midpoint2;
+//	int distance = meaSure(newImage, roi, midpoint1, midpoint2);
+//
+//	if (distance == -1) {
+//		return -1;
+//	}
+//
+//	int result = distance / cable;
+//	return result;
+//}
 
 cv::Mat numpy_array_to_cv_mat(const py::array_t<unsigned char>& arr) {
 	py::buffer_info buf_info = arr.request();

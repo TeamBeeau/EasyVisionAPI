@@ -270,8 +270,6 @@ namespace BeeAPI.Controllers
                             Console.WriteLine(result);
                             return Ok(new { value = result });
 
-
-
                         }
                     }
                     finally

@@ -273,6 +273,9 @@ System::String^ CCD:: ConnectBasler(System::String^ device) {
 				}
 				camGigE.Width.SetValue(cols);
 				camGigE.Height.SetValue(rows);
+				camGigE.GainRaw.SetValue(1);
+				camGigE.ExposureTimeRaw.SetValue(exposures);
+
 				int with = (int)camGigE.Width.GetMax();
 				int height = (int)camGigE.Height.GetMax();
 				camGigE.CenterX = true;
