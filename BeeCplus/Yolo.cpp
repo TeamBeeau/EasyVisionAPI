@@ -400,7 +400,7 @@ System::String^ Yolo::CheckYolo(float Score) {
 			else if (boundTemp.x2 <= boundingBoxes[0].x1 + 2)
 			{
 				boundingNews.push_back({ x1, y1, x2, y2 });
-				width += Math::Abs(x2 - x1);
+				width += Math::Abs(x2 - x1);//A
 			}
 
 		}
