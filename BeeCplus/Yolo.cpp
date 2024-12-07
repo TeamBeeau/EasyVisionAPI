@@ -219,111 +219,8 @@ std::tuple<py::list, py::list, float> GIL(float Score)
 	}
 	IsCheking = false;
 
-	return std::tuple<py::list, py::list, float>();
+	return std::tuple<py::list, py::list>();
 }
-
-struct BoundingBox {
-	int x1, y1, x2, y2;
-};
-
-int reChecking(Mat& image,  const std::vector<BoundingBox>& bounding_boxes, int numwire, float clength) {
-	std::vector<std::pair<cv::Point, cv::Point>> segments;
-	cv::Point STARTPoint, ENDPoint;
-
-	STARTPoint = cv::Point(bounding_boxes[0].x1, image.rows/2);
-	ENDPoint = cv::Point(bounding_boxes[bounding_boxes.size() - 1].x2, image.rows / 2);
-
-	LineIterator it(image, STARTPoint, ENDPoint, 8);
-	bool insideBox = false;
-	cv::Point segmentStart = STARTPoint;
-
-
-
-	for (int i = 0; i < it.count; ++i, ++it) {
-		cv::Point pt(it.pos());
-		insideBox = false;
-
-		for (const auto& box : bounding_boxes) {
-			if (pt.x >= box.x1 && pt.x <= box.x2 && pt.y >= box.y1 && pt.y <= box.y2) {
-				insideBox = true;
-				break;
-			}
-		}
-
-		if (insideBox) {
-			if (segmentStart != pt) {
-				segments.push_back({ segmentStart, pt });
-			}
-			while (i < it.count && insideBox) {
-				++i;
-				++it;
-				pt = it.pos();
-				insideBox = false;
-				for (const auto& box : bounding_boxes) {
-					if (pt.x >= box.x1 && pt.x <= box.x2 && pt.y >= box.y1 && pt.y <= box.y2) {
-						insideBox = true;
-						break;
-					}
-				}
-			}
-			segmentStart = pt;
-		}
-	}
-
-	if (segmentStart != ENDPoint) {
-		segments.push_back({ segmentStart, ENDPoint });
-	}
-
-	for (const auto& segment : segments) {
-		double length = sqrt(pow(segment.second.x - segment.first.x, 2) + pow(segment.second.y - segment.first.y, 2));
-
-		if (length >= clength * 0.4 && length < clength * 1.4) {
-			numwire++; 
-			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 1);
-			cv::putText(image, "+1", { segment.first.x, 0 + 30}, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
-
-		}
-		else if (length >= clength * 1.4 && length < clength * 2.4)
-		{
-			numwire = numwire + 2;
-			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 2);
-			cv::putText(image, "+2", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
-		}
-		else if (length >= clength * 2.4 && length < clength * 3.4)
-		{
-			numwire = numwire + 3;
-			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 2);
-			cv::putText(image, "+3", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
-		}
-		else
-		{
-			numwire = numwire + 0;
-		}
-	}
-	return numwire;
-}
-
-int xLeft = 0;
-bool IsReseted = false;
-std::vector<BoundingBox> boundingBoxes = {};
-
-int numWire = 0;
-System::String^ Yolo::Reset()
-{
-	boundingBoxes.clear();
-	IsReseted = true;
-	indexImage = 0;
-	numWire = 0;
-	boundingBoxes = {};
-	return  boundingBoxes.size().ToString();
-}
-// Hàm so sánh để sắp xếp theo tọa độ X
-bool compareByX(const BoundingBox& a, const BoundingBox& b) {
-	return a.x1 < b.x1; // Sắp xếp tăng dần theo X
-}
-cv::Point midpoint1, midpoint2;
-int xEndYolo = 0;
-int xEndYoloOld = 0;
 System::String^ Yolo::CheckYolo(float Score) {
 	numCable = 0;
 	if (IsCheking)
@@ -349,40 +246,67 @@ System::String^ Yolo::CheckYolo(float Score) {
 	std::lock_guard<std::mutex> lock(gilmutex);
 
 	py::gil_scoped_acquire acquire;
-	std::tuple<py::list, py::list, float> result=GIL(Score);
+//std::unique_lock<std::mutex> lock(gilmutex);
+//	std::lock_guard<std::mutex>lock(gilmutex);
+	std::tuple<py::list, py::list> result=GIL(Score);
 	
+//	std::cout << "Unlocked by thread: " << std::this_thread::get_id() << std::endl;
 	
+	//lock.unlock();
+	matResult = matProcess.clone();
+	//
+	
+	int numDetected = 0;
 	float pixelCable = 0, sumOfAll = 0;
 	float avg_width = 0;
 	int distanceV = 0, finalCable, cycleTime = 0, qty = 0;
 	std::ostringstream resultStream;
-	std::string status = "";
-
-
-	matResult = matProcess.clone();
+	std::string status="";
 	
+	// Kiểm tra xem hình ảnh có trống không
 
+	// Nếu ảnh là ảnh xám, chuyển sang ảnh màu BGR
+	/*if (matRaw.type() == CV_8UC1) {
+		cv::cvtColor(matRaw, img, CV_GRAY2BGR);
+	}
+	else {
+		img = matRaw.clone();
+	}*/
 
-	Rect roi = getROI(matResult);
-	Mat img_roi(matResult(roi));
-	Mat preimg = preImage(img_roi);
+	// Bảo vệ tài nguyên bằng mutex để đảm bảo thread safety
+	//std::lock_guard<std::mutex> lock(gilmutex);
 
+	try {
+		//matResult = img.clone();
+		///*py::gil_scoped_release release;
+		//pybind11::gil_scoped_acquire acquire;*/
+		////py::gil_scoped_acquire acquire;
+		////std::lock_guard<std::mutex> lock(gilmutex);  // Bảo vệ GIL
+		//if (PyGILState_Check() == 0)
+		//{
+		//	//py::gil_scoped_release release;
+		//	return "Fail lib";
+		//	//py::gil_scoped_acquire acquire;
+		//}
+
+		//else
+		//{
+		//	py::gil_scoped_release release;
+		//	py::gil_scoped_acquire acquire;
+		//}
+		//// Chuyển đổi OpenCV image sang numpy array để gửi tới Python
+		//py::array_t<uint8_t> image_array = mat_to_numpy1(img);
+
+		//// Gọi hàm YOLO trong Python để dự đoán
+		//auto result = _yolo.attr("predict")(image_array, Score);
+
+		//py::gil_scoped_release release;
 
 	try {
 		py::list Boxes = std::get<0>(result);
 		py::list Scores = std::get<1>(result);
-		avg_width = std::get<2>(result);
+			numDetected = Boxes.size();
 
-		
-		int	numDetectYolo = Boxes.size();
-			if (IsReseted&& boundingBoxes.size()>0)
-			{
-				IsReseted = false;
-				xLeft = midpoint1.x;
-			}
-			
-			std::vector<BoundingBox> boundingNews= {};
-			int width = 0;
 			// Duyệt qua các box dự đoán
 			for (size_t i = 0; i < Boxes.size(); ++i) {
 				auto box = Boxes[i].cast<py::tuple>();
@@ -390,80 +314,28 @@ System::String^ Yolo::CheckYolo(float Score) {
 				int x2 = box[2].cast<int>(), y2 = box[3].cast<int>();
 				float score = Scores[i].cast<float>();
 
-				BoundingBox boundTemp = { x1, y1, x2, y2 };
-				if (boundingBoxes.size() == 0)
-				{
+				sumOfAll += sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 
-					boundingNews.push_back({ x1, y1, x2, y2 });
-
-				}
-				else if (boundTemp.x2<= boundingBoxes[0].x1+2)
-				{
-					boundingNews.push_back({ x1, y1, x2, y2 });
-					width += Math::Abs(x2 - x1);
-				}
-			
+				// Vẽ hình chữ nhật và hiển thị điểm số
+				cv::Scalar color = (score >= 0.8) ? COLOR_EXCELLENT : (score >= 0.7) ? COLOR_GOOD : COLOR_AVERAGE;
+				cv::rectangle(matResult, { x1, y1 }, { x2, y2 }, color, 2);
+				cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 - 5 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1);
 			}
-			distanceV = meaSure(preimg, roi, midpoint1, midpoint2);
-			if (boundingBoxes.size() > 0&& xEndYolo!=0)
-			{
-				int delta = xEndYoloOld - xEndYolo;
-				for each (BoundingBox box in boundingBoxes)
-				{
-					box.x1 -= delta;
-					box.x2 -= delta;
-				}
-				if (xEndYolo != xEndYoloOld)
-					xEndYoloOld = xEndYolo;
+//			py::gil_scoped_release release;
+
+			// Kiểm tra nếu không phát hiện vật thể
+			if (numDetected == 0) {
+			/*	pixelCable = sumOfAll / numDetected;
+				int checking = distanceV / pixelCable;
+
+				status = (checking == numDetected) ? "OK"
+					: (checking < numDetected) ? "ERROR"
+					: "DETECTED AGAIN";
 			}
-			
-			/*for each (BoundingBox box in boundingBoxes)
-			{
-				box.x1 += width;
-				box.x2 += width;
-			}*/
-			// Gộp vector2 vào vector1
-			boundingBoxes.insert(boundingBoxes.end(), boundingNews.begin(), boundingNews.end());
-			std::sort(boundingBoxes.begin(), boundingBoxes.end(), compareByX);
-			xEndYolo = boundingBoxes[boundingBoxes.size() - 1].x2;
-
-			///boundingBoxes.push_back(boundingNews);
-			for each (BoundingBox box in boundingBoxes)
-			{
-				cv::Scalar color = COLOR_GOOD;// (score >= 0.8) ? COLOR_EXCELLENT : (score >= 0.7) ? COLOR_GOOD : COLOR_AVERAGE;
-				cv::rectangle(matResult, { box.x1, box.y1 }, { box.x2, box.y2 }, color, 2);
-			//	cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 + 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1);
-
+			else {*/
+			//	status = "NULL CABLE DETECTED.";
 			}
 		
-
-			//check again
-			if (boundingBoxes.size() > 1)
-				qty = reChecking(matResult, boundingBoxes, boundingBoxes.size(), avg_width);
-			else
-				qty = boundingBoxes.size();
-			if (qty > numCable )
-				numCable = qty;
-			
-			System::String^ managedString = "Test" + numCable + ".png";
-			msclr::interop::marshal_context context;
-			std::string path = context.marshal_as<std::string>(managedString);
-			
-			//cv::imwrite(path, matResult);
-			//indexImage++;
-			//			py::gil_scoped_release release;
-
-			//// Kiểm tra nếu không phát hiện vật thể
-			//if (numDetected > 0) {
-			//	/*qty = reChecking(matResult, midpoint1, midpoint2, boundingBoxes, numDetected, avg_width);*/
-			//	//pixelCable = sumOfAll / numDetected;
-			//	//finalCable = distanceV / pixelCable;
-
-			//	//if (finalCable > numDetected) {
-			//	//	finalCable = finalCable + recounter(matResult,midpoint1,midpoint2,Boxes);
-			//	//}
-			//}
-			//
 	}
 	
 	catch (...) {
@@ -473,9 +345,11 @@ System::String^ Yolo::CheckYolo(float Score) {
 	if(status!="")
 		return gcnew System::String(status.c_str());
 	int cycle = int(clock() - startTime);
-	return gcnew System::String("0" + "," + numCable + "," + cycle);
+	return gcnew System::String("0," +numDetected + "," + cycle + ",0");
+	
+	///gil_acquire1.~gil_scoped_acquire_local();
+//	gil_acquire.~gil_scoped_acquire_local();
 }
-
 //System::String^ Yolo::CheckYolo(float Score) {
 //
 //	if (IsCheking)
