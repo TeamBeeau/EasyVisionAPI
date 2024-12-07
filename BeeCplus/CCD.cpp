@@ -271,10 +271,10 @@ System::String^ CCD:: ConnectBasler(System::String^ device) {
 				{
 					ptrAutoPacketSize->SetValue(true);
 				}
-				camGigE.Width.SetValue(cols);
-				camGigE.Height.SetValue(rows);
+				camGigE.Width.SetValue(1000);
+				camGigE.Height.SetValue(100);
 				camGigE.GainRaw.SetValue(1);
-				camGigE.ExposureTimeRaw.SetValue(exposures);
+				camGigE.ExposureTimeRaw.SetValue(3500);
 
 				int with = (int)camGigE.Width.GetMax();
 				int height = (int)camGigE.Height.GetMax();
@@ -364,6 +364,8 @@ Mat equalizeBGRA(const Mat& img)
 System::String^ CCD::GrabBasler() {
 	if (IsCap)
 		return "";
+	
+	if (!camGigE.IsOpen())return FALSE;
 	//std::lock_guard<std::mutex>lock(gilmutex);
 	IsCap = true;
 //	std::unique_lock<std::mutex> lock(gilmutex);
@@ -383,7 +385,7 @@ System::String^ CCD::GrabBasler() {
 			matProcess = matRaw.clone();
 		}
 	}
-
+	//cv::imshow("raw", matProcess);
 	ptrGrabResult.Release();
 	camGigE.StopGrabbing();
 	//lock.unlock();

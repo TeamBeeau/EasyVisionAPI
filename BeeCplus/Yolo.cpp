@@ -152,7 +152,7 @@ System::String^ Yolo::IniGIL() {
 
 System::String^ Yolo::ImportRaw()
 {
-	System::String^ managedString = "test" + indexImage + ".png";
+	System::String^ managedString = "test.png";
 	msclr::interop::marshal_context context;
 	std::string path = context.marshal_as<std::string>(managedString);
 
@@ -225,14 +225,15 @@ std::tuple<py::list, py::list, float> GIL(float Score)
 struct BoundingBox {
 	int x1, y1, x2, y2;
 };
-
+cv::Point midpoint1, midpoint2;
 int reChecking(Mat& image, const std::vector<BoundingBox>& bounding_boxes, int numwire, float clength) {
+	if (bounding_boxes.size() == 0)return 0;
 	std::vector<std::pair<cv::Point, cv::Point>> segments;
 	cv::Point STARTPoint, ENDPoint;
 
 	STARTPoint = cv::Point(bounding_boxes[0].x1, image.rows / 2);
-	ENDPoint = cv::Point(bounding_boxes[bounding_boxes.size() - 1].x2, image.rows / 2);
-
+	//ENDPoint = cv::Point(bounding_boxes[bounding_boxes.size() - 1].x2, image.rows / 2);
+	ENDPoint = midpoint2;
 	LineIterator it(image, STARTPoint, ENDPoint, 8);
 	bool insideBox = false;
 	cv::Point segmentStart = STARTPoint;
@@ -269,16 +270,25 @@ int reChecking(Mat& image, const std::vector<BoundingBox>& bounding_boxes, int n
 			segmentStart = pt;
 		}
 	}
+	//cv::rectangle(image, ENDPoint, midpoint2, COLOR_POOR, 1);
+	//cv::putText(image, "EN", { ENDPoint.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
+	//numwire += 1;
 
 	if (segmentStart != ENDPoint) {
 		segments.push_back({ segmentStart, ENDPoint });
 	}
-
+	int index = 0;
 	for (const auto& segment : segments) {
 		double length = sqrt(pow(segment.second.x - segment.first.x, 2) + pow(segment.second.y - segment.first.y, 2));
 
 		if (length >= clength * 0.4 && length < clength * 1.4) {
 			numwire++;
+			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 1);
+			cv::putText(image, "+1", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
+
+		}
+		else if (segment == segments[segments.size() - 1] && length <  clength * 0.4 ) 
+	   {numwire++;
 			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 1);
 			cv::putText(image, "+1", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
 
@@ -300,28 +310,30 @@ int reChecking(Mat& image, const std::vector<BoundingBox>& bounding_boxes, int n
 			numwire = numwire + 0;
 		}
 	}
+
+
 	return numwire;
 }
 
 int xLeft = 0;
 bool IsReseted = false;
-std::vector<BoundingBox> boundingBoxes = {};
+
 
 int numWire = 0;
 System::String^ Yolo::Reset()
 {
-	boundingBoxes.clear();
+	/*boundingBoxes.clear();
 	IsReseted = true;
 	indexImage = 0;
-	numWire = 0;
-	boundingBoxes = {};
-	return  boundingBoxes.size().ToString();
+	numWire = 0;*/
+	//boundingBoxes = {};
+	return "";// boundingBoxes.size().ToString();
 }
 // Hàm so sánh để sắp xếp theo tọa độ X
 bool compareByX(const BoundingBox& a, const BoundingBox& b) {
 	return a.x1 < b.x1; // Sắp xếp tăng dần theo X
 }
-cv::Point midpoint1, midpoint2;
+
 int xEndYolo = 0;
 int xEndYoloOld = 0;
 System::String^ Yolo::CheckYolo(float Score) {
@@ -360,7 +372,7 @@ System::String^ Yolo::CheckYolo(float Score) {
 
 
 	matResult = matProcess.clone();
-
+	std::vector<BoundingBox> boundingBoxes = {};
 
 
 	Rect roi = getROI(matResult);
@@ -375,13 +387,13 @@ System::String^ Yolo::CheckYolo(float Score) {
 
 
 		int	numDetectYolo = Boxes.size();
-		if (IsReseted && boundingBoxes.size() > 0)
+		/*if (IsReseted && boundingBoxes.size() > 0)
 		{
 			IsReseted = false;
 			xLeft = midpoint1.x;
-		}
+		}*/
 
-		std::vector<BoundingBox> boundingNews = {};
+		//std::vector<BoundingBox> boundingNews = {};
 		int width = 0;
 		// Duyệt qua các box dự đoán
 		for (size_t i = 0; i < Boxes.size(); ++i) {
@@ -389,23 +401,27 @@ System::String^ Yolo::CheckYolo(float Score) {
 			int x1 = box[0].cast<int>(), y1 = box[1].cast<int>();
 			int x2 = box[2].cast<int>(), y2 = box[3].cast<int>();
 			float score = Scores[i].cast<float>();
+			boundingBoxes.push_back({ x1, y1, x2, y2 });
+			cv::Scalar color = (score >= 0.8) ? COLOR_EXCELLENT : (score >= 0.7) ? COLOR_GOOD : COLOR_AVERAGE;
+			cv::rectangle(matResult, { x1, y1 }, { x2,y2 }, color, 2);
+			cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 + 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, color, 1);
 
-			BoundingBox boundTemp = { x1, y1, x2, y2 };
-			if (boundingBoxes.size() == 0)
-			{
+			//BoundingBox boundTemp = { x1, y1, x2, y2 };
+			//if (boundingBoxes.size() == 0)
+			//{
 
-				boundingNews.push_back({ x1, y1, x2, y2 });
+			//	boundingNews.push_back({ x1, y1, x2, y2 });
 
-			}
-			else if (boundTemp.x2 <= boundingBoxes[0].x1 + 2)
-			{
-				boundingNews.push_back({ x1, y1, x2, y2 });
-				width += Math::Abs(x2 - x1);
-			}
+			//}
+			//else if (boundTemp.x2 <= boundingBoxes[0].x1 + 2)
+			//{
+			//	boundingNews.push_back({ x1, y1, x2, y2 });
+			//	width += Math::Abs(x2 - x1);//A
+			//}
 
 		}
 		distanceV = meaSure(preimg, roi, midpoint1, midpoint2);
-		if (boundingBoxes.size() > 0 && xEndYolo != 0)
+	/*	if (boundingBoxes.size() > 0 && xEndYolo != 0)
 		{
 			int delta = xEndYoloOld - xEndYolo;
 			for each (BoundingBox box in boundingBoxes)
@@ -415,7 +431,7 @@ System::String^ Yolo::CheckYolo(float Score) {
 			}
 			if (xEndYolo != xEndYoloOld)
 				xEndYoloOld = xEndYolo;
-		}
+		}*/
 
 		/*for each (BoundingBox box in boundingBoxes)
 		{
@@ -423,31 +439,34 @@ System::String^ Yolo::CheckYolo(float Score) {
 			box.x2 += width;
 		}*/
 		// Gộp vector2 vào vector1
-		boundingBoxes.insert(boundingBoxes.end(), boundingNews.begin(), boundingNews.end());
-		std::sort(boundingBoxes.begin(), boundingBoxes.end(), compareByX);
-		xEndYolo = boundingBoxes[boundingBoxes.size() - 1].x2;
+	//	boundingBoxes.insert(boundingBoxes.end(), boundingNews.begin(), boundingNews.end());
+	//	std::sort(boundingBoxes.begin(), boundingBoxes.end(), compareByX);
+	//	xEndYolo = boundingBoxes[boundingBoxes.size() - 1].x2;
 
 		///boundingBoxes.push_back(boundingNews);
-		for each (BoundingBox box in boundingBoxes)
-		{
-			cv::Scalar color = COLOR_GOOD;// (score >= 0.8) ? COLOR_EXCELLENT : (score >= 0.7) ? COLOR_GOOD : COLOR_AVERAGE;
-			cv::rectangle(matResult, { box.x1, box.y1 }, { box.x2, box.y2 }, color, 2);
-			//	cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 + 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1);
+		//for each (BoundingBox box in boundingBoxes)
+		//{
+		//	cv::Scalar color = COLOR_GOOD;// (score >= 0.8) ? COLOR_EXCELLENT : (score >= 0.7) ? COLOR_GOOD : COLOR_AVERAGE;
+		//	cv::rectangle(matResult, { box.x1, box.y1 }, { box.x2, box.y2 }, color, 2);
+		//	//	cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 + 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1);
 
-		}
+		//}
 
 
 		//check again
-		if (boundingBoxes.size() > 1)
-			qty = reChecking(matResult, boundingBoxes, boundingBoxes.size(), avg_width);
-		else
-			qty = boundingBoxes.size();
-		if (qty > numCable)
-			numCable = qty;
+		//if (boundingBoxes.size() > 1)
+		numCable = reChecking(matResult, boundingBoxes, boundingBoxes.size(), avg_width);
 
-		System::String^ managedString = "Test" + numCable + ".png";
-		msclr::interop::marshal_context context;
-		std::string path = context.marshal_as<std::string>(managedString);
+
+
+		//else
+		//	qty = boundingBoxes.size();
+		//if (qty > numCable)
+		//	numCable = qty;
+
+		//System::String^ managedString = "Test" + numCable + ".png";
+		//msclr::interop::marshal_context context;
+		//std::string path = context.marshal_as<std::string>(managedString);
 
 		//cv::imwrite(path, matResult);
 		//indexImage++;
@@ -464,6 +483,7 @@ System::String^ Yolo::CheckYolo(float Score) {
 		//	//}
 		//}
 		//
+	//	cv::imshow("RS", matResult);
 	}
 
 	catch (...) {

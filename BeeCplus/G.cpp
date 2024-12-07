@@ -43,7 +43,7 @@ namespace BeeCplus
 	int numCable;
 	int distanceCable;
 	std::string pathYolo;
-	std::string pathModel = "C:\\model.pt";
+	std::string pathModel = "model.pt";
 	std::string nameYolo = "yolo";
 
 	struct gil_scoped_acquire_local {
