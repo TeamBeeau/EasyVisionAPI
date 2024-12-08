@@ -81,10 +81,19 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main.Designer.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Main.resx">
+      <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -94,6 +103,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -114,6 +124,291 @@
       <Project>{7db94466-4136-44e9-9415-0db151cd4914}</Project>
       <Name>BeeCplus</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-removebg-preview.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-removebg-preview1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ad_ibiw_rgb_b.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BtnBlue1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BtnBlue2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BID_UNDERBUTTON_72PIX_FORTYPEC_ACTIVE_CENTER.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Thumbnail_180x174_MountArea_Active.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BtnGreen1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BtnGreen2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BID_UNDERBUTTON_72PIX_FORTYPEC_ROLLOVER_CENTER.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Thumbnail_180x174_MountArea_Down.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BID_UNDERBUTTON_72PIX_FORTYPEC_NORMAL_CENTER.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Thumbnail_180x174_MountArea_Normal.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Camera.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Camera_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Delete.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Down Button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Down Button_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Down Button_2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Down Button_3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Down Button1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Download.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Download1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Export.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-admin-48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-admin-96.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-camera-off-40.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-camera-off-60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-check-24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-check-60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-click-30.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-click-40.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-click-60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-click-60 %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-download-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-download-70.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-edge-constraint-100.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-edge-constraint-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-expand-collapse-arrows-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-folder-30.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-folder-40.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-folder-60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-help-40.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-help-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-help-70.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-image-60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-image-60 %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-kite-shape-80.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-live-40.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-live-60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-live-70.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-magnifying-glass-100.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-magnifying-glass-70.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-reset-100.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-reset-100 %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-reset-30.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-reset-35.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-reset-60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-reset-70.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-reset-80.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-save-40.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-save-60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-setting-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-settings-100.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-settings-40.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-settings-70.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-square-150.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-square-150 %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-square-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-square-80.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-square-border-100.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-start-40.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-start-48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-start-60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-camera-30.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-camera-30 %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-camera-30 %282%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-camera-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-camera-50 %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-click-on-zoom-in-or-out-isolated-on-white-background-24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-click-on-zoom-in-or-out-isolated-on-white-background-24 %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-click-on-zoom-in-or-out-isolated-on-white-background-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-live-30.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-reset-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-save-30.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-save-as-30.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Key_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Language Skill.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Language Skill_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PCI-e.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Video Record.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

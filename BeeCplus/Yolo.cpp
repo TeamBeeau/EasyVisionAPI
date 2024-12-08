@@ -287,7 +287,7 @@ int reChecking(Mat& image, const std::vector<BoundingBox>& bounding_boxes, int n
 			cv::putText(image, "+1", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
 
 		}
-		else if (segment == segments[segments.size() - 1] && length <  clength * 0.4 ) 
+		else if (segment == segments[segments.size() - 1] && length <  clength * 0.4 ) //
 	   {numwire++;
 			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 1);
 			cv::putText(image, "+1", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
