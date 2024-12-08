@@ -82,11 +82,11 @@ namespace BeeForm
             }
             //
             int heightraw = 0, widthraw = 0, typeraw = 0;
-            IntPtr intPtrraw = GetImage(ref height, ref width, ref type);
+            IntPtr intPtrraw = GetImage(ref heightraw, ref widthraw, ref typeraw);
 
             unsafe
             {
-                Mat rawimg = new Mat(height, width, type, intPtr);
+                Mat rawimg = new Mat(heightraw, widthraw, typeraw, intPtrraw);
                 viewraw.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(rawimg);
             }
             //
@@ -175,11 +175,11 @@ namespace BeeForm
                 }
                 //
                 int heightraw = 0, widthraw = 0, typeraw = 0;
-                IntPtr intPtrraw = GetImage(ref height, ref width, ref type);
+                IntPtr intPtrraw = GetImage(ref heightraw, ref widthraw, ref typeraw);
 
                 unsafe
                 {
-                    Mat rawimg = new Mat(height, width, type, intPtr);
+                    Mat rawimg = new Mat(heightraw, widthraw, typeraw, intPtrraw);
                     viewraw.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(rawimg);
                 }
                 //
