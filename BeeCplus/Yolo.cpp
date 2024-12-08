@@ -305,7 +305,7 @@ int reChecking(Mat& image, const std::vector<BoundingBox>& bounding_boxes, int n
 			numwire++;
 
 			recFilled(matResult, { segment.first.x, 30 }, { segment.second.x, 130 }, COLOR_POOR, 0.2);
-			cv::putText(matResult, "+1", {segment.first.x, +15}, cv::FONT_HERSHEY_SIMPLEX, 0.3, COLOR_POOR, 1);
+			cv::putText(matResult, "+1", {segment.first.x, +15}, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
 			//cv::putText(matResult, std::to_string(i).substr(0, 3), { x1, 145 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, color, 1);
 
 		}
@@ -313,20 +313,20 @@ int reChecking(Mat& image, const std::vector<BoundingBox>& bounding_boxes, int n
 	   {
 			numwire++;
 			recFilled(matResult, { segment.first.x, 30 }, { segment.second.x, 130 }, COLOR_POOR, 0.2);
-			cv::putText(matResult, "+1", { segment.first.x, +15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, COLOR_POOR, 1);
+			cv::putText(matResult, "", { segment.first.x, +15 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
 
 		}
 		else if (length >= clength * 1.4 && length < clength * 2.4)
 		{
 			numwire = numwire + 2;
 			recFilled(matResult, { segment.first.x, 30 }, { segment.second.x, 130 }, COLOR_POOR, 0.2);
-			cv::putText(matResult, "+2", { segment.first.x, +15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, COLOR_POOR, 1);
+			cv::putText(matResult, "+2", { segment.first.x, +15 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
 		}
 		else if (length >= clength * 2.4 && length < clength * 3.4)
 		{
 			numwire = numwire + 3;
 			recFilled(matResult, { segment.first.x, 30 }, { segment.second.x, 130 }, COLOR_POOR, 0.2);
-			cv::putText(matResult, "+3", { segment.first.x, +15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, COLOR_POOR, 1);
+			cv::putText(matResult, "+3", { segment.first.x, +15 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
 		}
 		else
 		{
@@ -426,12 +426,23 @@ System::String^ Yolo::CheckYolo(float Score) {
 			int x2 = box[2].cast<int>() + 30, y2 = box[3].cast<int>() + 30;
 			float score = Scores[i].cast<float>();
 			boundingBoxes.push_back({ x1, y1, x2, y2 });
-			cv::Scalar color = (score >= 0.8) ? COLOR_EXCELLENT : (score >= 0.7) ? COLOR_GOOD : COLOR_AVERAGE;
-			//cv::rectangle(matResult, { x1, y1 }, { x2,y2 }, color, 2);
-			recFilled(matResult, { x1, y1 }, { x2,y2 }, color, 0.2);
+			//cv::Scalar color = (score >= 0.8) ? COLOR_EXCELLENT : (score >= 0.7) ? COLOR_GOOD : COLOR_AVERAGE;
 
-			cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 - 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, color, 1);
-			cv::putText(matResult, std::to_string(i).substr(0, 3), { x1, 145 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, color, 1);
+
+			//cv::rectangle(matResult, { x1, y1 }, { x2,y2 }, color, 2);
+			
+			if (i % 2 == 0) {
+				recFilled(matResult, { x1, y1 }, { x2,y2 }, COLOR_EXCELLENT, 0.2);
+				cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 - 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_EXCELLENT, 1);
+				cv::putText(matResult, std::to_string(i + 1).substr(0, 3), { x1, 145 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_EXCELLENT, 1);
+			}
+			else
+			{
+				recFilled(matResult, { x1, y1 }, { x2,y2 }, COLOR_2EXCELLENT, 0.2);
+				cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 - 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_2EXCELLENT, 1);
+				cv::putText(matResult, std::to_string(i + 1).substr(0, 3), { x1, 145 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_2EXCELLENT, 1);
+			}
+
 			//BoundingBox boundTemp = { x1, y1, x2, y2 };
 			//if (boundingBoxes.size() == 0)
 			//{

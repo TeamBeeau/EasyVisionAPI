@@ -43,10 +43,11 @@ namespace py = pybind11;
 #define SUCCESS  "SUCCESS."
 
 #define COLOR_BAD       cv::Scalar(0, 0, 255)   // Đỏ
-#define COLOR_POOR      cv::Scalar(0, 128, 255) // Cam
+#define COLOR_POOR      cv::Scalar(127, 255, 0) // Cam (127 255 0)
 #define COLOR_AVERAGE   cv::Scalar(0, 255, 255) // Vàng
 #define COLOR_GOOD      cv::Scalar(0, 255, 128) // Màu Lime
 #define COLOR_EXCELLENT cv::Scalar(0, 255, 0)   // Xanh lá cây
+#define COLOR_2EXCELLENT cv::Scalar(0, 139, 0)   
 
 typedef Pylon::CBaslerGigEInstantCamera Camera_t;
 typedef Camera_t::GrabResultPtr_t GrabResultPtr_t;
