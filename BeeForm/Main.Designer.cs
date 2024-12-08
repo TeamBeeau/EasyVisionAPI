@@ -768,7 +768,7 @@
             this.panel4.Margin = new System.Windows.Forms.Padding(4);
             this.panel4.Name = "panel4";
             this.panel4.Padding = new System.Windows.Forms.Padding(5);
-            this.panel4.Size = new System.Drawing.Size(959, 84);
+            this.panel4.Size = new System.Drawing.Size(959, 111);
             this.panel4.TabIndex = 3;
             // 
             // btnTrigger
@@ -782,7 +782,7 @@
             this.btnTrigger.Location = new System.Drawing.Point(5, 5);
             this.btnTrigger.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.btnTrigger.Name = "btnTrigger";
-            this.btnTrigger.Size = new System.Drawing.Size(184, 74);
+            this.btnTrigger.Size = new System.Drawing.Size(184, 101);
             this.btnTrigger.TabIndex = 22;
             this.btnTrigger.Text = "Trigger";
             this.btnTrigger.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -802,7 +802,7 @@
             this.btnSaveImage.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.btnSaveImage.Name = "btnSaveImage";
             this.btnSaveImage.Padding = new System.Windows.Forms.Padding(2);
-            this.btnSaveImage.Size = new System.Drawing.Size(199, 74);
+            this.btnSaveImage.Size = new System.Drawing.Size(199, 101);
             this.btnSaveImage.TabIndex = 22;
             this.btnSaveImage.Text = "SaveImage";
             this.btnSaveImage.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -815,7 +815,7 @@
             this.panel11.Location = new System.Drawing.Point(767, 5);
             this.panel11.Margin = new System.Windows.Forms.Padding(4);
             this.panel11.Name = "panel11";
-            this.panel11.Size = new System.Drawing.Size(20, 74);
+            this.panel11.Size = new System.Drawing.Size(20, 101);
             this.panel11.TabIndex = 21;
             // 
             // button1
@@ -829,7 +829,7 @@
             this.button1.Location = new System.Drawing.Point(787, 5);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(167, 74);
+            this.button1.Size = new System.Drawing.Size(167, 101);
             this.button1.TabIndex = 20;
             this.button1.Text = "Folder";
             this.button1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -955,7 +955,7 @@
             this.panel18.Controls.Add(this.panel20);
             this.panel18.Controls.Add(this.panel19);
             this.panel18.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel18.Location = new System.Drawing.Point(0, 231);
+            this.panel18.Location = new System.Drawing.Point(0, 258);
             this.panel18.Name = "panel18";
             this.panel18.Size = new System.Drawing.Size(959, 59);
             this.panel18.TabIndex = 8;
@@ -966,7 +966,7 @@
             this.panel5.Controls.Add(this.lbCount);
             this.panel5.Controls.Add(this.lbValue);
             this.panel5.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel5.Location = new System.Drawing.Point(0, 290);
+            this.panel5.Location = new System.Drawing.Point(0, 317);
             this.panel5.Margin = new System.Windows.Forms.Padding(4);
             this.panel5.Name = "panel5";
             this.panel5.Padding = new System.Windows.Forms.Padding(7, 6, 7, 6);
@@ -1090,10 +1090,10 @@
             // 
             this.panel7.Controls.Add(this.view);
             this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel7.Location = new System.Drawing.Point(0, 475);
+            this.panel7.Location = new System.Drawing.Point(0, 502);
             this.panel7.Margin = new System.Windows.Forms.Padding(4);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(959, 329);
+            this.panel7.Size = new System.Drawing.Size(959, 302);
             this.panel7.TabIndex = 12;
             // 
             // view
@@ -1101,7 +1101,7 @@
             this.view.Dock = System.Windows.Forms.DockStyle.Fill;
             this.view.Location = new System.Drawing.Point(0, 0);
             this.view.Name = "view";
-            this.view.Size = new System.Drawing.Size(959, 329);
+            this.view.Size = new System.Drawing.Size(959, 302);
             this.view.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.view.TabIndex = 0;
             this.view.TabStop = false;
@@ -1110,7 +1110,7 @@
             // 
             this.panel22.Controls.Add(this.viewraw);
             this.panel22.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel22.Location = new System.Drawing.Point(0, 475);
+            this.panel22.Location = new System.Drawing.Point(0, 502);
             this.panel22.Margin = new System.Windows.Forms.Padding(4);
             this.panel22.Name = "panel22";
             this.panel22.Size = new System.Drawing.Size(959, 166);
