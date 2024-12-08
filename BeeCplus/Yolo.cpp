@@ -11,7 +11,26 @@ struct gil_scoped_acquire_local {
 	~gil_scoped_acquire_local() { PyGILState_Release(state); }
 	const PyGILState_STATE state;
 };
+cv::Mat addWhitePadding(const cv::Mat& image, int padding_top, int padding_bottom) {
+	cv::Mat padded_image;
+	cv::copyMakeBorder(
+		image,
+		padded_image,
+		padding_top,
+		padding_bottom,
+		0,
+		0,
+		cv::BORDER_CONSTANT,
+		cv::Scalar(255, 255, 255)
+	);
 
+	return padded_image;
+}
+void recFilled(cv::Mat& image, cv::Point top_left, cv::Point bottom_right, cv::Scalar color, double alpha) {
+	cv::Mat overlay = image.clone();
+	cv::rectangle(overlay, { top_left.x , top_left.y }, { bottom_right.x , bottom_right.y }, color, cv::FILLED);
+	cv::addWeighted(overlay, alpha, image, 1 - alpha, 0, image);
+}
 Rect getROI(Mat& img) {
 	int roi_x = img.cols / 7;
 	int roi_y = img.rows / 4;
@@ -231,8 +250,9 @@ int reChecking(Mat& image, const std::vector<BoundingBox>& bounding_boxes, int n
 	std::vector<std::pair<cv::Point, cv::Point>> segments;
 	cv::Point STARTPoint, ENDPoint;
 
-	STARTPoint = cv::Point(bounding_boxes[0].x1, image.rows / 2);
+	/*STARTPoint = cv::Point(bounding_boxes[0].x1, image.rows / 2);*/
 	//ENDPoint = cv::Point(bounding_boxes[bounding_boxes.size() - 1].x2, image.rows / 2);
+	STARTPoint = midpoint1;
 	ENDPoint = midpoint2;
 	LineIterator it(image, STARTPoint, ENDPoint, 8);
 	bool insideBox = false;
@@ -283,27 +303,30 @@ int reChecking(Mat& image, const std::vector<BoundingBox>& bounding_boxes, int n
 
 		if (length >= clength * 0.4 && length < clength * 1.4) {
 			numwire++;
-			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 1);
-			cv::putText(image, "+1", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
+
+			recFilled(matResult, { segment.first.x, 30 }, { segment.second.x, 130 }, COLOR_POOR, 0.2);
+			cv::putText(matResult, "+1", {segment.first.x, +15}, cv::FONT_HERSHEY_SIMPLEX, 0.3, COLOR_POOR, 1);
+			//cv::putText(matResult, std::to_string(i).substr(0, 3), { x1, 145 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, color, 1);
 
 		}
 		else if (segment == segments[segments.size() - 1] && length <  clength * 0.4 ) //
-	   {numwire++;
-			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 1);
-			cv::putText(image, "+1", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
+	   {
+			numwire++;
+			recFilled(matResult, { segment.first.x, 30 }, { segment.second.x, 130 }, COLOR_POOR, 0.2);
+			cv::putText(matResult, "+1", { segment.first.x, +15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, COLOR_POOR, 1);
 
 		}
 		else if (length >= clength * 1.4 && length < clength * 2.4)
 		{
 			numwire = numwire + 2;
-			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 2);
-			cv::putText(image, "+2", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
+			recFilled(matResult, { segment.first.x, 30 }, { segment.second.x, 130 }, COLOR_POOR, 0.2);
+			cv::putText(matResult, "+2", { segment.first.x, +15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, COLOR_POOR, 1);
 		}
 		else if (length >= clength * 2.4 && length < clength * 3.4)
 		{
 			numwire = numwire + 3;
-			cv::rectangle(image, { segment.first.x, 0 }, { segment.second.x, 98 }, COLOR_POOR, 2);
-			cv::putText(image, "+3", { segment.first.x, 0 + 30 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, COLOR_POOR, 1);
+			recFilled(matResult, { segment.first.x, 30 }, { segment.second.x, 130 }, COLOR_POOR, 0.2);
+			cv::putText(matResult, "+3", { segment.first.x, +15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, COLOR_POOR, 1);
 		}
 		else
 		{
@@ -395,17 +418,20 @@ System::String^ Yolo::CheckYolo(float Score) {
 
 		//std::vector<BoundingBox> boundingNews = {};
 		int width = 0;
-		// Duyệt qua các box dự đoán
+		matResult = addWhitePadding(matResult, 30, 30);
+
 		for (size_t i = 0; i < Boxes.size(); ++i) {
 			auto box = Boxes[i].cast<py::tuple>();
-			int x1 = box[0].cast<int>(), y1 = box[1].cast<int>();
-			int x2 = box[2].cast<int>(), y2 = box[3].cast<int>();
+			int x1 = box[0].cast<int>() + 30, y1 = box[1].cast<int>() + 30;
+			int x2 = box[2].cast<int>() + 30, y2 = box[3].cast<int>() + 30;
 			float score = Scores[i].cast<float>();
 			boundingBoxes.push_back({ x1, y1, x2, y2 });
 			cv::Scalar color = (score >= 0.8) ? COLOR_EXCELLENT : (score >= 0.7) ? COLOR_GOOD : COLOR_AVERAGE;
-			cv::rectangle(matResult, { x1, y1 }, { x2,y2 }, color, 2);
-			cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 + 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, color, 1);
+			//cv::rectangle(matResult, { x1, y1 }, { x2,y2 }, color, 2);
+			recFilled(matResult, { x1, y1 }, { x2,y2 }, color, 0.2);
 
+			cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 - 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, color, 1);
+			cv::putText(matResult, std::to_string(i).substr(0, 3), { x1, 145 }, cv::FONT_HERSHEY_SIMPLEX, 0.3, color, 1);
 			//BoundingBox boundTemp = { x1, y1, x2, y2 };
 			//if (boundingBoxes.size() == 0)
 			//{

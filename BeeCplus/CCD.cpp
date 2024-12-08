@@ -362,35 +362,42 @@ Mat equalizeBGRA(const Mat& img)
 	return res;
 }bool IsCap = false;
 System::String^ CCD::GrabBasler() {
-	if (IsCap)
-		return "";
-	
-	if (!camGigE.IsOpen())return FALSE;
-	//std::lock_guard<std::mutex>lock(gilmutex);
-	IsCap = true;
-//	std::unique_lock<std::mutex> lock(gilmutex);
-	matRaw.release();
-	matProcess.release();
-	matResult.release();
-	camGigE.StartGrabbing();
-	camGigE.RetrieveResult(-1, ptrGrabResult, TimeoutHandling_ThrowException);//Lay Data Camera SAU KHOẢNG THỜI GIAN SẼ THOÁT RA ,(NẾU GIÁ TRỊ BẰNG -1 KHÔNG THOÁT RA)
-	if (ptrGrabResult->GrabSucceeded())
+	try
 	{
-		fc.Convert(image, ptrGrabResult);
-		matRaw = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC1, (uint8_t*)image.GetBuffer(), Mat::AUTO_STEP);
-		if (matRaw.type() == CV_8UC1) {
-			cv::cvtColor(matRaw, matProcess, CV_GRAY2BGR);
-		}
-		else {
-			matProcess = matRaw.clone();
-		}
-	}
-	//cv::imshow("raw", matProcess);
-	ptrGrabResult.Release();
-	camGigE.StopGrabbing();
-	//lock.unlock();
-	IsCap = false;
+		if (IsCap)
+			return "";
 
+		if (!camGigE.IsOpen())return FALSE;
+		//std::lock_guard<std::mutex>lock(gilmutex);
+		IsCap = true;
+		//	std::unique_lock<std::mutex> lock(gilmutex);
+		matRaw.release();
+		matProcess.release();
+		matResult.release();
+		if (!camGigE.IsOpen())return"FAIL";
+		camGigE.StartGrabbing();
+		camGigE.RetrieveResult(-1, ptrGrabResult, TimeoutHandling_ThrowException);//Lay Data Camera SAU KHOẢNG THỜI GIAN SẼ THOÁT RA ,(NẾU GIÁ TRỊ BẰNG -1 KHÔNG THOÁT RA)
+		if (ptrGrabResult->GrabSucceeded())
+		{
+			fc.Convert(image, ptrGrabResult);
+			matRaw = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC1, (uint8_t*)image.GetBuffer(), Mat::AUTO_STEP);
+			if (matRaw.type() == CV_8UC1) {
+				cv::cvtColor(matRaw, matProcess, CV_GRAY2BGR);
+			}
+			else {
+				matProcess = matRaw.clone();
+			}
+		}
+		//cv::imshow("raw", matProcess);
+		ptrGrabResult.Release();
+		camGigE.StopGrabbing();
+		//lock.unlock();
+		IsCap = false;
+	}
+	catch (...)
+	{
+
+	}
 	return SUCCESS;
 }
 
