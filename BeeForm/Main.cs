@@ -19,6 +19,8 @@ namespace BeeForm
     {
         [DllImport(@".\BeeCplus.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         unsafe public static extern IntPtr GetResultImage(ref int h, ref int w, ref int type);
+        [DllImport(@".\BeeCplus.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        unsafe public static extern IntPtr GetImage(ref int h, ref int w, ref int type);
         public Main()
         {
             InitializeComponent();
@@ -28,12 +30,12 @@ namespace BeeForm
         private void Main_Load(object sender, EventArgs e)
         {
             String result = Yolo.IniGIL();
-            lbStatus.Text = result;
+            lbIni.Text = result;
             List<String> list = CCD.ScanBasler();
             if (list.Count() > 0)
             {
-                String nameCam = CCD.ConnectBasler("CAM1");
-                lbStatus.Text = "CAM1";
+                String nameCam = CCD.ConnectBasler(list[0]);
+                lbStatus.Text = "Connected";
             }
             else
             {
@@ -78,6 +80,16 @@ namespace BeeForm
                 Mat raw = new Mat(height, width, type, intPtr);
                 view.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(raw);
             }
+            //
+            int heightraw = 0, widthraw = 0, typeraw = 0;
+            IntPtr intPtrraw = GetImage(ref height, ref width, ref type);
+
+            unsafe
+            {
+                Mat rawimg = new Mat(height, width, type, intPtr);
+                viewraw.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(rawimg);
+            }
+            //
         }
         private DateTime startTime;
         private TimeSpan elapsedTime;
@@ -161,6 +173,16 @@ namespace BeeForm
                     Mat raw = new Mat(height, width, type, intPtr);
                     view.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(raw);
                 }
+                //
+                int heightraw = 0, widthraw = 0, typeraw = 0;
+                IntPtr intPtrraw = GetImage(ref height, ref width, ref type);
+
+                unsafe
+                {
+                    Mat rawimg = new Mat(height, width, type, intPtr);
+                    viewraw.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(rawimg);
+                }
+                //
             }
             if (counter == value)
             {
@@ -221,7 +243,7 @@ namespace BeeForm
         }
         private void tbarScore_ValueChanged(object sender, EventArgs e)
         {
-            lbVScore.Text = Convert.ToSingle((float)tbarScore.Value / 10).ToString();
+            lbVScore.Text = (tbarScore.Value * 10).ToString();
         }
 
         private void button2_Click(object sender, EventArgs e)

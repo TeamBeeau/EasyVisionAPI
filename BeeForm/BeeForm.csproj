@@ -92,6 +92,7 @@
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
+    <Compile Include="PLC.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Main.resx">
@@ -411,6 +412,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Video Record.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="ActUtlType64Lib">
+      <Guid>{719A5FAB-EB1C-4B52-98BC-F8C9F6912D04}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
