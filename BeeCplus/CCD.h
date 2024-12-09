@@ -46,7 +46,10 @@ namespace BeeCplus {
 	public:float cycle = 0;
 	public:int numERR = 0;
 	public:bool IsErrCCD = false;
-	public:int  cols = 1000, rows = 100,typ=0, exposures = 600;
+	/// <summary>
+	/// thay doi cac thong so khi khoi tao o day
+	/// </summary>
+	public:int  cols = 1000, rows = 100,typ=0, exposures = 600, offsetYs = 600;
 	public:int colCrop, rowCrop;
 
 	public:void ReadRaw(bool IsHist);

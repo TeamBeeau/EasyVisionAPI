@@ -271,15 +271,16 @@ System::String^ CCD:: ConnectBasler(System::String^ device) {
 				{
 					ptrAutoPacketSize->SetValue(true);
 				}
-				camGigE.Width.SetValue(1000);
-				camGigE.Height.SetValue(100);
+				camGigE.Width.SetValue(cols);
+				camGigE.Height.SetValue(rows);
 				camGigE.GainRaw.SetValue(1);
-				camGigE.ExposureTimeRaw.SetValue(3500);
+				camGigE.OffsetY.SetValue(offsetYs);
+				camGigE.ExposureTimeRaw.SetValue(exposures);
 
 				int with = (int)camGigE.Width.GetMax();
 				int height = (int)camGigE.Height.GetMax();
 				camGigE.CenterX = true;
-				camGigE.CenterX = true;
+				//camGigE.CenterX = true;
 
 
 				camGigE.StartGrabbing();//Tao luong Doc anh

@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using BeeCplus;
 using System.Runtime.InteropServices;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Threading;
 
 namespace BeeForm
 {
@@ -21,12 +22,17 @@ namespace BeeForm
         unsafe public static extern IntPtr GetResultImage(ref int h, ref int w, ref int type);
         [DllImport(@".\BeeCplus.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         unsafe public static extern IntPtr GetImage(ref int h, ref int w, ref int type);
+       static PLC PLC = new PLC();
         public Main()
         {
             InitializeComponent();
+            this.Icon = new Icon("drb.ico");
         }
         Yolo Yolo = new Yolo();
         CCD CCD = new CCD();
+        private static Thread readThread;
+        private static bool isRunning = true;
+
         private void Main_Load(object sender, EventArgs e)
         {
             String result = Yolo.IniGIL();
@@ -35,7 +41,7 @@ namespace BeeForm
             if (list.Count() > 0)
             {
                 String nameCam = CCD.ConnectBasler(list[0]);
-                lbStatus.Text = "Connected";
+                lbStatus.Text = "ConnectedCam";
             }
             else
             {
@@ -50,8 +56,38 @@ namespace BeeForm
             {
 
             }
+            try
+            {
+                //PLC.OpenConnection(1);
+                //lbPLC.Text = "ConnectedPLC";
+                //readThread = new Thread(ReadLoop);
+                //readThread.IsBackground = true;
+                //readThread.Start(); 
+            }
+            catch
+            {
+                lbPLC.Text = "No PLC";
+            }
         }
+        static bool value;
+        
+        private static void ReadLoop()
+        {
+            while (isRunning)
+            {
+                bool read = PLC.ReadBit("X000", out value);
+                if (read == true)
+                {
+                   
+                }
+                else
+                {
+                    
+                }
 
+                Thread.Sleep(500); 
+            }
+        }
         private void btnTrigger_Click(object sender, EventArgs e)
         {
             CCD.GrabBasler();
@@ -59,6 +95,7 @@ namespace BeeForm
             string[] numbers = rs.Split(',');
             if (numbers.Length > 2)
             {
+               
                 lbWires.Text = numbers[0];
                 lbCounter.Text = numbers[1];
                 lbCycle.Text = numbers[2];
@@ -126,6 +163,7 @@ namespace BeeForm
         bool IsLive;
         private int previousCounter = 0;
         int newCounter;
+        private DateTime lastErrorTime = DateTime.MinValue;
         private void tmRun_Tick(object sender, EventArgs e)
         {
             CCD.GrabBasler();
@@ -148,12 +186,25 @@ namespace BeeForm
             }
             if (newCounter > value)
             {
-                BtnRun.PerformClick();
-                tmRun.Enabled = false;
-                IsLive = false;
-                lbCount.Text = "Error";
-                MessageBox.Show("Error: The counted quantity is greater than the norm ");
-                return;
+                if (lastErrorTime == DateTime.MinValue) 
+                {
+                    lastErrorTime = DateTime.Now;
+                }
+
+                if ((DateTime.Now - lastErrorTime).TotalSeconds >= 2)
+                {
+                    BtnRun.PerformClick();
+                    tmRun.Enabled = false;
+                    IsLive = false;
+                    lbCount.Text = "Error";
+                    MessageBox.Show("Error: The counted quantity is greater than the norm");
+                    return;
+                }
+            }
+            else
+            {
+                
+                lastErrorTime = DateTime.MinValue;
             }
             int counter = Convert.ToInt32(lbCounter.Text);
             
@@ -166,6 +217,11 @@ namespace BeeForm
             lbPT.Text = progressValue.ToString();
             int height = 0, width = 0, type = 0;
             IntPtr intPtr = GetResultImage(ref height, ref width, ref type);
+            //
+            int heightraw = 0, widthraw = 0, typeraw = 0;
+            IntPtr intPtrraw = GetImage(ref heightraw, ref widthraw, ref typeraw);
+            //
+
             if (newCounter >= previousCounter)
             {
                 unsafe
@@ -174,9 +230,7 @@ namespace BeeForm
                     view.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(raw);
                 }
                 //
-                int heightraw = 0, widthraw = 0, typeraw = 0;
-                IntPtr intPtrraw = GetImage(ref heightraw, ref widthraw, ref typeraw);
-
+                
                 unsafe
                 {
                     Mat rawimg = new Mat(heightraw, widthraw, typeraw, intPtrraw);
@@ -186,6 +240,7 @@ namespace BeeForm
             }
             if (counter == value)
             {
+               
                 BtnRun.PerformClick();
                 tmRun.Enabled = false;
                 IsLive = false;
