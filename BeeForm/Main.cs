@@ -13,16 +13,17 @@ using BeeCplus;
 using System.Runtime.InteropServices;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Threading;
+using System.IO.Ports;
 
 namespace BeeForm
 {
     public partial class Main : Form
     {
+        PLC PLC = new PLC("COM11", 9600, 8, StopBits.One, Parity.Odd);
         [DllImport(@".\BeeCplus.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         unsafe public static extern IntPtr GetResultImage(ref int h, ref int w, ref int type);
         [DllImport(@".\BeeCplus.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         unsafe public static extern IntPtr GetImage(ref int h, ref int w, ref int type);
-       static PLC PLC = new PLC();
         public Main()
         {
             InitializeComponent();
@@ -32,7 +33,6 @@ namespace BeeForm
         CCD CCD = new CCD();
         private static Thread readThread;
         private static bool isRunning = true;
-
         private void Main_Load(object sender, EventArgs e)
         {
             String result = Yolo.IniGIL();
@@ -56,38 +56,65 @@ namespace BeeForm
             {
 
             }
-            try
+            if (PLC.Connect())
             {
-                //PLC.OpenConnection(1);
-                //lbPLC.Text = "ConnectedPLC";
-                //readThread = new Thread(ReadLoop);
-                //readThread.IsBackground = true;
-                //readThread.Start(); 
+                WriteAndReadTest();
+                lbPLC.Text = "ConnectedPLC";
+                readThread = new Thread(ReadLoop);
+                readThread.IsBackground = true;
+                readThread.Start();
+               
             }
-            catch
+            else
             {
                 lbPLC.Text = "No PLC";
-            }
+            } 
         }
         static bool value;
-        
-        private static void ReadLoop()
+        private void ReadLoop()
         {
-            while (isRunning)
+            while (isRunning) // isRunning kiểm soát việc tiếp tục đọc
             {
-                bool read = PLC.ReadBit("X000", out value);
-                if (read == true)
+                try
                 {
-                   
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error reading from PLC: {ex.Message}");
+                }
+
+                Thread.Sleep(500);
+            }
+        }
+        public void WriteAndReadTest()
+        {
+            try
+            {
+                // Bước 1: Ghi dữ liệu xuống PLC
+                int[] dataToWrite = { 1, 2, 3, 4 }; // Dữ liệu cần ghi
+                PLC.Write(dataToWrite); // Ghi dữ liệu
+                MessageBox.Show("Data written successfully: " + string.Join(", ", dataToWrite));
+
+                // Bước 2: Chờ PLC xử lý
+                Thread.Sleep(100); // Đợi PLC xử lý lệnh ghi
+
+                // Bước 3: Đọc dữ liệu từ PLC
+                int[] dataRead = PLC.Read(); // Đọc dữ liệu
+                if (dataRead != null && dataRead.Length > 0)
+                {
+                    MessageBox.Show("Data read successfully: " + string.Join(", ", dataRead));
                 }
                 else
                 {
-                    
+                    MessageBox.Show("Error: No data read from PLC.");
                 }
-
-                Thread.Sleep(500); 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
             }
         }
+
         private void btnTrigger_Click(object sender, EventArgs e)
         {
             CCD.GrabBasler();
@@ -266,7 +293,15 @@ namespace BeeForm
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             CCD.DisconnectBasler();
+            PLC.Disconnect();
+            if (readThread != null && readThread.IsAlive)
+            {
+                isRunning = false; 
+                readThread.Join();
+                Console.WriteLine("Read thread has been stopped.");
+            }
             Yolo.FinalizeGIL();
+            
         }
 
         private void trackBar1_ValueChanged(object sender, EventArgs e)
@@ -311,6 +346,10 @@ namespace BeeForm
             lbCounter.Text= "0";
             pbar.Value = pbar.Minimum;
            
+        }
+
+        private void btnSaveImage_Click(object sender, EventArgs e)
+        {
         }
     }
 }

@@ -47,12 +47,9 @@ namespace BeeAPI.Controllers
         [Route("SetPara")]
         public IHttpActionResult SetPara(string para, string value)
         {
-            lock (this)
-            {
                 var result = Global.model.CCD.SetParaA(para, value);
 
                 return Ok(new { message = result ?? "Không nhận được phản hồi từ SetPara" });
-            }
         }
         [HttpGet]
         [Route("Reset")]

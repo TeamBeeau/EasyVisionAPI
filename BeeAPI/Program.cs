@@ -17,7 +17,7 @@ namespace BeeAPI
        // static  Timer tmIniTial =new Timer();
         static void Main(string[] args)
         {
-            string baseAddress = "http://localhost:8080/";
+            string baseAddress = "http://localhost:7777/";
             ThreadPool.SetMaxThreads(1, 1);
             ThreadPool.SetMinThreads(1, 1);
 
