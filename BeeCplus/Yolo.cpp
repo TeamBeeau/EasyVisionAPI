@@ -36,7 +36,9 @@ Rect getROI(Mat& img) {
 	int roi_y = img.rows / 4;
 	int roi_width = img.cols * 0.8;
 	int roi_height = img.rows * 0.5;
-	return Rect(roi_x, roi_y, roi_width, roi_height);
+	Rect roi = Rect(roi_x, roi_y, roi_width, roi_height);
+	//rectangle(img, roi, Scalar(0, 255, 0), 1);
+	return roi;
 }
 
 Mat preImage(const Mat& img) {
@@ -57,7 +59,6 @@ Mat preImage(const Mat& img) {
 	bitwise_and(mono8Image, thresholdImage, result);
 	return result;
 }
-
 
 float meaSure(const Mat& mat1, const Rect& roi, cv::Point& midpoint1, cv::Point& midpoint2) {
 	int xmin_top = mat1.cols - 1, xmax_top = 0;
@@ -91,6 +92,30 @@ float meaSure(const Mat& mat1, const Rect& roi, cv::Point& midpoint1, cv::Point&
 	//line(matResult, midpoint1, midpoint2, Scalar(255, 0, 0), 1);
 	// Return the distance between the midpoints
 	return sqrt(pow(midpoint2.x - midpoint1.x, 2) + pow(midpoint2.y - midpoint1.y, 2));
+}
+
+System::String^ Yolo::CheckBinary(int mode) {
+	if (mode == 0) {
+		getROI(matRaw);
+		rectangle(matResult, getROI(matRaw), Scalar(0, 255, 0), 1);
+		return SUCCESS;
+	}
+	else if (mode == 1)
+	{
+		Mat img = matRaw.clone();
+		Mat grayImage, mBlurImage, blurImage, thresholdImage;
+		if (img.channels() == 1 && img.depth() == CV_8UC1) {
+			grayImage = img;
+		}
+		else {
+			cvtColor(img, grayImage, COLOR_BGR2GRAY);
+		}
+		medianBlur(grayImage, mBlurImage, 3);
+		blur(mBlurImage, blurImage, cv::Size(3, 3));
+		threshold(blurImage, thresholdImage, 150, 255, THRESH_BINARY);
+		matResult = thresholdImage.clone();
+		return SUCCESS;
+	}
 }
 
 py::array_t<unsigned char> mat_to_numpy1(const cv::Mat& mat) {
@@ -458,69 +483,8 @@ System::String^ Yolo::CheckYolo(float Score) {
 
 		}
 		distanceV = meaSure(preimg, roi, midpoint1, midpoint2);
-	/*	if (boundingBoxes.size() > 0 && xEndYolo != 0)
-		{
-			int delta = xEndYoloOld - xEndYolo;
-			for each (BoundingBox box in boundingBoxes)
-			{
-				box.x1 -= delta;
-				box.x2 -= delta;
-			}
-			if (xEndYolo != xEndYoloOld)
-				xEndYoloOld = xEndYolo;
-		}*/
 
-		/*for each (BoundingBox box in boundingBoxes)
-		{
-			box.x1 += width;
-			box.x2 += width;
-		}*/
-		// Gộp vector2 vào vector1
-	//	boundingBoxes.insert(boundingBoxes.end(), boundingNews.begin(), boundingNews.end());
-	//	std::sort(boundingBoxes.begin(), boundingBoxes.end(), compareByX);
-	//	xEndYolo = boundingBoxes[boundingBoxes.size() - 1].x2;
-
-		///boundingBoxes.push_back(boundingNews);
-		//for each (BoundingBox box in boundingBoxes)
-		//{
-		//	cv::Scalar color = COLOR_GOOD;// (score >= 0.8) ? COLOR_EXCELLENT : (score >= 0.7) ? COLOR_GOOD : COLOR_AVERAGE;
-		//	cv::rectangle(matResult, { box.x1, box.y1 }, { box.x2, box.y2 }, color, 2);
-		//	//	cv::putText(matResult, std::to_string(score).substr(0, 3), { x1, y1 + 15 }, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1);
-
-		//}
-
-
-		//check again
-		//if (boundingBoxes.size() > 1)
 		numCable = reChecking(matResult, boundingBoxes, boundingBoxes.size(), avg_width);
-
-
-
-		//else
-		//	qty = boundingBoxes.size();
-		//if (qty > numCable)
-		//	numCable = qty;
-
-		//System::String^ managedString = "Test" + numCable + ".png";
-		//msclr::interop::marshal_context context;
-		//std::string path = context.marshal_as<std::string>(managedString);
-
-		//cv::imwrite(path, matResult);
-		//indexImage++;
-		//			py::gil_scoped_release release;
-
-		//// Kiểm tra nếu không phát hiện vật thể
-		//if (numDetected > 0) {
-		//	/*qty = reChecking(matResult, midpoint1, midpoint2, boundingBoxes, numDetected, avg_width);*/
-		//	//pixelCable = sumOfAll / numDetected;
-		//	//finalCable = distanceV / pixelCable;
-
-		//	//if (finalCable > numDetected) {
-		//	//	finalCable = finalCable + recounter(matResult,midpoint1,midpoint2,Boxes);
-		//	//}
-		//}
-		//
-	//	cv::imshow("RS", matResult);
 	}
 
 	catch (...) {

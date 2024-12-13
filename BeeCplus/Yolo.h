@@ -13,7 +13,10 @@ namespace BeeCplus {
 	public:	System::String^ Reset();
 	//public:System::String^ TestYolo(float Score);
 	public:System::String^ CheckYolo(float Score);
+	public:System::String^ Yolo::CheckBinary(int mode);
 
+
+		  
 	};
 	
 	
